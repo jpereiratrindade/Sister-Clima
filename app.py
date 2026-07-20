@@ -432,16 +432,10 @@ if menu_selecionado == "🌎 Explorador Nacional":
             with col_table:
                 st.markdown("**Registro Analítico Diário**")
                 st.dataframe(
-                    df_live.sort_values(by="Data", ascending=False).style.format({"Chuva (mm)": "{:.1f}", "Acumulado (mm)": "{:.1f}"}),
-                    use_container_width=True, height=300
-                )
-        except Exception as e:
-            st.error(f"Erro na comunicação com a API: {e}")
-
-elif menu_selecionado == "📊 Operação Consolidada":
+                    df_live.sort_values(by="Data", ascending=False).style.format({"Chuva (mm)": "{:.1f}", "Acumulado (mm)":elif menu_selecionado == "📊 Operação Consolidada":
     st.markdown("### Controle Base Operacional - Rio Grande do Sul")
     st.markdown("Gestão dos dados salvos no repositório pela rotina de automação `daily_fetch`.")
-    
+
     CSV_PATH = "data/chuva_diaria.csv"
     if not os.path.exists(CSV_PATH):
         st.warning("Nenhum arquivo 'chuva_diaria.csv' encontrado. Aguarde a automação ou execute o script de coleta.")
@@ -452,79 +446,139 @@ elif menu_selecionado == "📊 Operação Consolidada":
         # Obter siglas dos estados
         df_municipios["nome_uf"] = df_municipios["nome"] + " (" + df_municipios["codigo_uf"].map(df_estados.set_index("codigo_uf")["uf"]) + ")"
 
-        col_sel1, col_sel2 = st.columns(2)
+        # ---- LINHA 1: Cidades + Fonte de Dados ----
+        col_sel1, col_sel2, col_sel3 = st.columns([2, 2, 1])
         with col_sel1:
             cidades_sel = st.multiselect("Cidades Ativas (Histórico):", options=sorted(df["cidade"].unique()), default=df["cidade"].unique())
         with col_sel2:
             cidades_extras_sel = st.multiselect(
-                "Adicionar Outros Municípios (Tempo Real):", 
+                "Adicionar Outros Municípios:",
                 options=sorted(df_municipios["nome_uf"].unique()),
-                help="Busca dados históricos em tempo real diretamente da API Open-Meteo Archive e plota no mapa."
+                help="Busca dados via API e plota junto com o histórico local."
+            )
+        with col_sel3:
+            fonte_cons = st.radio(
+                "Fonte (extras):",
+                ["🟡 Open-Meteo", "🚀 NASA POWER"],
+                help="Fonte usada para buscar os municípios extras em tempo real."
             )
 
-        datas_disponiveis = df["data"].dt.date.unique()
-        
-        if len(datas_disponiveis) > 0:
-            datas_selecionadas = st.date_input("Filtro de Período:", value=(min(datas_disponiveis), max(datas_disponiveis)), min_value=min(datas_disponiveis), max_value=max(datas_disponiveis))
-            
-            if isinstance(datas_selecionadas, tuple) and len(datas_selecionadas) == 2:
-                data_inicio, data_fim = datas_selecionadas
+        # ---- LINHA 2: Seletor de Período ----
+        st.markdown("**Período de Análise:**")
+        col_preset, col_datas = st.columns([1, 2])
+        with col_preset:
+            preset = st.selectbox(
+                "Atalho:",
+                ["Personalizado", "Últimos 7 dias", "Últimos 30 dias", "Últimos 90 dias", "Últimos 365 dias", "Todo o histórico"]
+            )
+        with col_datas:
+            hoje = datetime.now().date()
+            if preset == "Últimos 7 dias":
+                data_inicio_def = hoje - timedelta(days=7)
+                data_fim_def = hoje
+            elif preset == "Últimos 30 dias":
+                data_inicio_def = hoje - timedelta(days=30)
+                data_fim_def = hoje
+            elif preset == "Últimos 90 dias":
+                data_inicio_def = hoje - timedelta(days=90)
+                data_fim_def = hoje
+            elif preset == "Últimos 365 dias":
+                data_inicio_def = hoje - timedelta(days=365)
+                data_fim_def = hoje
+            elif preset == "Todo o histórico":
+                data_inicio_def = df["data"].dt.date.min()
+                data_fim_def = df["data"].dt.date.max()
             else:
-                data_inicio = data_fim = datas_selecionadas[0] if isinstance(datas_selecionadas, tuple) else datas_selecionadas
+                data_inicio_def = df["data"].dt.date.min()
+                data_fim_def = df["data"].dt.date.max()
 
-            mask = (df["cidade"].isin(cidades_sel)) & (df["data"].dt.date >= data_inicio) & (df["data"].dt.date <= data_fim)
-            df_filtrado = df[mask].copy()
+            datas_selecionadas = st.date_input(
+                "Intervalo:",
+                value=(data_inicio_def, data_fim_def),
+                min_value=date(2020, 1, 1),
+                max_value=hoje
+            )
 
-            # Buscar dados extras da API se houver cidades extras selecionadas
-            if cidades_extras_sel:
-                extra_dfs = []
-                with st.spinner("Buscando dados climáticos adicionais..."):
-                    for item in cidades_extras_sel:
-                        cidade_info = df_municipios[df_municipios["nome_uf"] == item].iloc[0]
-                        cidade_nome = cidade_info["nome"]
-                        lat, lon = cidade_info["latitude"], cidade_info["longitude"]
-                        
-                        # Chamar Archive API
-                        archive_url = "https://archive-api.open-meteo.com/v1/archive"
-                        params = {
-                            "latitude": lat,
-                            "longitude": lon,
-                            "start_date": data_inicio.strftime("%Y-%m-%d"),
-                            "end_date": data_fim.strftime("%Y-%m-%d"),
-                            "daily": "precipitation_sum",
-                            "timezone": "America/Sao_Paulo"
-                        }
-                        try:
+        if isinstance(datas_selecionadas, tuple) and len(datas_selecionadas) == 2:
+            data_inicio, data_fim = datas_selecionadas
+        else:
+            data_inicio = data_fim = datas_selecionadas[0] if isinstance(datas_selecionadas, tuple) else datas_selecionadas
+
+        # Filtrar dados históricos locais
+        mask = (df["cidade"].isin(cidades_sel)) & (df["data"].dt.date >= data_inicio) & (df["data"].dt.date <= data_fim)
+        df_filtrado = df[mask].copy()
+
+        # Buscar dados extras
+        if cidades_extras_sel:
+            extra_dfs = []
+            with st.spinner(f"Buscando via {'NASA POWER MERRA-2' if 'NASA POWER' in fonte_cons else 'Open-Meteo Archive'}..."):
+                for item in cidades_extras_sel:
+                    cidade_info = df_municipios[df_municipios["nome_uf"] == item].iloc[0]
+                    cidade_nome = cidade_info["nome"]
+                    lat, lon = cidade_info["latitude"], cidade_info["longitude"]
+                    uf_label = item.split("(")[-1].replace(")", "").strip()
+                    label = f"{cidade_nome} ({uf_label})"
+
+                    try:
+                        if "NASA POWER" in fonte_cons:
+                            nasa_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
+                            nasa_params = {
+                                "parameters": "PRECTOTCORR", "community": "AG",
+                                "longitude": lon, "latitude": lat,
+                                "start": data_inicio.strftime("%Y%m%d"),
+                                "end": data_fim.strftime("%Y%m%d"),
+                                "format": "JSON"
+                            }
+                            res = requests.get(nasa_url, params=nasa_params, timeout=20)
+                            res.raise_for_status()
+                            raw = res.json()["properties"]["parameter"]["PRECTOTCORR"]
+                            df_extra = pd.DataFrame([
+                                {"cidade": label, "data": pd.to_datetime(k, format="%Y%m%d"),
+                                 "precipitacao_mm": max(v, 0.0), "latitude": lat, "longitude": lon}
+                                for k, v in raw.items()
+                            ])
+                        else:
+                            archive_url = "https://archive-api.open-meteo.com/v1/archive"
+                            params = {
+                                "latitude": lat, "longitude": lon,
+                                "start_date": data_inicio.strftime("%Y-%m-%d"),
+                                "end_date": data_fim.strftime("%Y-%m-%d"),
+                                "daily": "precipitation_sum", "timezone": "America/Sao_Paulo"
+                            }
                             res = requests.get(archive_url, params=params, timeout=12)
                             res.raise_for_status()
-                            data = res.json()
-                            
+                            data_api = res.json()
                             df_extra = pd.DataFrame({
-                                "cidade": [f"{cidade_nome} ({cidade_info['nome_uf'].split('(')[-1].replace(')', '')})"] * len(data["daily"]["time"]),
-                                "data": pd.to_datetime(data["daily"]["time"]),
-                                "precipitacao_mm": data["daily"]["precipitation_sum"],
-                                "latitude": [lat] * len(data["daily"]["time"]),
-                                "longitude": [lon] * len(data["daily"]["time"])
+                                "cidade": [label] * len(data_api["daily"]["time"]),
+                                "data": pd.to_datetime(data_api["daily"]["time"]),
+                                "precipitacao_mm": data_api["daily"]["precipitation_sum"],
+                                "latitude": [lat] * len(data_api["daily"]["time"]),
+                                "longitude": [lon] * len(data_api["daily"]["time"])
                             })
                             df_extra["precipitacao_mm"] = df_extra["precipitacao_mm"].fillna(0.0)
-                            extra_dfs.append(df_extra)
-                        except Exception as e:
-                            st.warning(f"Não foi possível obter dados para {cidade_nome}: {e}")
-                
-                if extra_dfs:
-                    df_extra_total = pd.concat(extra_dfs, ignore_index=True)
-                    df_filtrado = pd.concat([df_filtrado, df_extra_total], ignore_index=True)
 
-            kpi1, kpi2, kpi3 = st.columns(3)
+                        extra_dfs.append(df_extra)
+                    except Exception as e:
+                        st.warning(f"Não foi possível obter dados para {cidade_nome}: {e}")
+
+            if extra_dfs:
+                df_filtrado = pd.concat([df_filtrado, pd.concat(extra_dfs, ignore_index=True)], ignore_index=True)
+
+        if df_filtrado.empty:
+            st.info("Nenhum dado no período selecionado. Ajuste o intervalo ou adicione municípios extras.")
+        else:
+            st.divider()
+            kpi1, kpi2, kpi3, kpi4 = st.columns(4)
             kpi1.metric("Soma Total no Período", f"{df_filtrado['precipitacao_mm'].sum():.1f} mm")
             kpi2.metric("Média de Precipitação", f"{df_filtrado['precipitacao_mm'].mean():.1f} mm")
             kpi3.metric("Maior Evento Crítico", f"{df_filtrado['precipitacao_mm'].max():.1f} mm")
+            kpi4.metric("Cidades Monitoradas", f"{df_filtrado['cidade'].nunique()}")
 
             st.write("")
             col_chart, col_map = st.columns(2)
             with col_chart:
                 fig_linha = px.line(
-                    df_filtrado, x="data", y="precipitacao_mm", color="cidade", 
+                    df_filtrado, x="data", y="precipitacao_mm", color="cidade",
                     title="Evolução Temporal Comparativa", template="plotly_white",
                     markers=True
                 )
@@ -546,6 +600,7 @@ elif menu_selecionado == "📊 Operação Consolidada":
                     )
                 fig_mapa.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=20, r=20, t=40, b=20))
                 st.plotly_chart(fig_mapa, use_container_width=True)
+
 
 elif menu_selecionado == "📖 Sobre os Dados":
     st.markdown("### 📖 Transparência e Conformidade de Dados")
