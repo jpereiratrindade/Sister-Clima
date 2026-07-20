@@ -91,11 +91,11 @@ header[data-testid="stHeader"] {
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0c2844, #071e38) !important;
 }
-/* Forçar Flexbox na Sidebar para empurrar o Rodapé */
+/* Forçar Posição Relativa e Margem no Rodapé */
 [data-testid="stSidebarUserContent"] {
-    display: flex !important;
-    flex-direction: column !important;
-    height: calc(100vh - 80px) !important;
+    position: relative !important;
+    padding-bottom: 80px !important;
+    min-height: calc(100vh - 70px) !important;
 }
 
 /* Textos da Sidebar para Branco/Azul Claro */
@@ -152,18 +152,23 @@ div[role="radiogroup"] label:hover {
     margin-bottom: 20px;
 }
 .sidebar-logo-text {
-    font-size: 1.5rem;
-    font-weight: 900;
+    font-size: 1.15rem;
+    font-weight: 800;
     color: #ffffff;
     margin-bottom: 30px;
-    letter-spacing: 2px;
+    line-height: 1.25;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
 }
 .sidebar-footer-container {
-    margin-top: auto !important;
+    position: absolute !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
     font-size: 0.75rem;
     color: rgba(255,255,255,0.5);
-    padding: 15px 10px 10px 10px;
     border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 10px;
 }
 </style>
 """
@@ -209,7 +214,7 @@ df_municipios = load_municipios()
 # SIDEBAR (Navegação)
 # ==========================================
 with st.sidebar:
-    st.markdown('<div class="sidebar-logo-text">SISTER</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-logo-text">Resiliência Climática</div>', unsafe_allow_html=True)
     menu_selecionado = st.radio(
         "Navegação:",
         ["🌎 Explorador Nacional", "📊 Operação Consolidada"],
@@ -348,7 +353,19 @@ elif menu_selecionado == "📊 Operação Consolidada":
         df = pd.read_csv(CSV_PATH)
         df["data"] = pd.to_datetime(df["data"])
 
-        cidades_sel = st.multiselect("Cidades Ativas:", options=sorted(df["cidade"].unique()), default=df["cidade"].unique())
+        # Obter siglas dos estados
+        df_municipios["nome_uf"] = df_municipios["nome"] + " (" + df_municipios["codigo_uf"].map(df_estados.set_index("codigo_uf")["sigla"]) + ")"
+
+        col_sel1, col_sel2 = st.columns(2)
+        with col_sel1:
+            cidades_sel = st.multiselect("Cidades Ativas (Histórico):", options=sorted(df["cidade"].unique()), default=df["cidade"].unique())
+        with col_sel2:
+            cidades_extras_sel = st.multiselect(
+                "Adicionar Outros Municípios (Tempo Real):", 
+                options=sorted(df_municipios["nome_uf"].unique()),
+                help="Busca dados históricos em tempo real diretamente da API Open-Meteo Archive e plota no mapa."
+            )
+
         datas_disponiveis = df["data"].dt.date.unique()
         
         if len(datas_disponiveis) > 0:
@@ -360,7 +377,47 @@ elif menu_selecionado == "📊 Operação Consolidada":
                 data_inicio = data_fim = datas_selecionadas[0] if isinstance(datas_selecionadas, tuple) else datas_selecionadas
 
             mask = (df["cidade"].isin(cidades_sel)) & (df["data"].dt.date >= data_inicio) & (df["data"].dt.date <= data_fim)
-            df_filtrado = df[mask]
+            df_filtrado = df[mask].copy()
+
+            # Buscar dados extras da API se houver cidades extras selecionadas
+            if cidades_extras_sel:
+                extra_dfs = []
+                with st.spinner("Buscando dados climáticos adicionais..."):
+                    for item in cidades_extras_sel:
+                        cidade_info = df_municipios[df_municipios["nome_uf"] == item].iloc[0]
+                        cidade_nome = cidade_info["nome"]
+                        lat, lon = cidade_info["latitude"], cidade_info["longitude"]
+                        
+                        # Chamar Archive API
+                        archive_url = "https://archive-api.open-meteo.com/v1/archive"
+                        params = {
+                            "latitude": lat,
+                            "longitude": lon,
+                            "start_date": data_inicio.strftime("%Y-%m-%d"),
+                            "end_date": data_fim.strftime("%Y-%m-%d"),
+                            "daily": "precipitation_sum",
+                            "timezone": "America/Sao_Paulo"
+                        }
+                        try:
+                            res = requests.get(archive_url, params=params, timeout=12)
+                            res.raise_for_status()
+                            data = res.json()
+                            
+                            df_extra = pd.DataFrame({
+                                "cidade": [f"{cidade_nome} ({cidade_info['nome_uf'].split('(')[-1].replace(')', '')})"] * len(data["daily"]["time"]),
+                                "data": pd.to_datetime(data["daily"]["time"]),
+                                "precipitacao_mm": data["daily"]["precipitation_sum"],
+                                "latitude": [lat] * len(data["daily"]["time"]),
+                                "longitude": [lon] * len(data["daily"]["time"])
+                            })
+                            df_extra["precipitacao_mm"] = df_extra["precipitacao_mm"].fillna(0.0)
+                            extra_dfs.append(df_extra)
+                        except Exception as e:
+                            st.warning(f"Não foi possível obter dados para {cidade_nome}: {e}")
+                
+                if extra_dfs:
+                    df_extra_total = pd.concat(extra_dfs, ignore_index=True)
+                    df_filtrado = pd.concat([df_filtrado, df_extra_total], ignore_index=True)
 
             kpi1, kpi2, kpi3 = st.columns(3)
             kpi1.metric("Soma Total no Período", f"{df_filtrado['precipitacao_mm'].sum():.1f} mm")
