@@ -364,7 +364,7 @@ elif menu_selecionado == "📊 Operação Consolidada":
         df["data"] = pd.to_datetime(df["data"])
 
         # Obter siglas dos estados
-        df_municipios["nome_uf"] = df_municipios["nome"] + " (" + df_municipios["codigo_uf"].map(df_estados.set_index("codigo_uf")["sigla"]) + ")"
+        df_municipios["nome_uf"] = df_municipios["nome"] + " (" + df_municipios["codigo_uf"].map(df_estados.set_index("codigo_uf")["uf"]) + ")"
 
         col_sel1, col_sel2 = st.columns(2)
         with col_sel1:
