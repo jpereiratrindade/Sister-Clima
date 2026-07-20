@@ -5,7 +5,7 @@ import os
 import requests
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="SISTER | Resiliência Climática", layout="wide", page_icon="🌧️", initial_sidebar_state="expanded")
+st.set_page_config(page_title="SISTER-Clima | Resiliência Climática", layout="wide", page_icon="🌧️", initial_sidebar_state="expanded")
 
 # Injeção de CSS Customizado
 custom_css = """
@@ -48,7 +48,7 @@ header[data-testid="stHeader"] {
 }
 .brand-main {
     color: #ffffff;
-    font-size: 1.05rem;
+    font-size: 1.0rem;
     font-weight: 800;
 }
 .topbar-center {
@@ -193,13 +193,13 @@ st.markdown("""
       <g fill="currentColor"><circle cx="32" cy="5" r="4"/><circle cx="55" cy="18" r="4"/><circle cx="55" cy="46" r="4"/><circle cx="32" cy="59" r="4"/><circle cx="9" cy="46" r="4"/><circle cx="9" cy="18" r="4"/><circle cx="32" cy="32" r="5"/></g>
     </svg>
     <div class="brand-container">
-      <span class="brand-super">RESILIÊNCIA</span>
-      <span class="brand-main">Clima v2</span>
+      <span class="brand-super">SISTER</span>
+      <span class="brand-main">Clima</span>
     </div>
   </div>
-  <div class="topbar-center">SISTER | Painel de Resiliência Climática</div>
+  <div class="topbar-center">SISTER-Clima | Painel de Resiliência Climática | Dados via <a href="https://open-meteo.com" target="_blank" style="color:#5ec8f5;text-decoration:none;font-weight:800;">Open-Meteo API</a></div>
   <div class="topbar-right">
-    <a href="https://github.com/jpereiratrindade/Open-Meteo" target="_blank" class="topbar-btn">Repositório GitHub</a>
+    <a href="https://github.com/jpereiratrindade/Sister-Clima" target="_blank" class="topbar-btn">Repositório GitHub</a>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -230,17 +230,34 @@ with st.sidebar:
         ["🌎 Explorador Nacional", "📊 Operação Consolidada"],
         label_visibility="collapsed"
     )
-    st.markdown('<div class="sidebar-footer-container">© 2026 Embrapa<br>Painel de Resiliência Climática v2.0</div>', unsafe_allow_html=True)
+    # Timestamp de última atualização (sem dependência externa)
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    try:
+        agora = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y às %H:%Mh")
+    except Exception:
+        agora = datetime.now().strftime("%d/%m/%Y às %H:%Mh")
+    st.markdown(
+        f'<div class="sidebar-footer-container">'
+        f'<b style="color:rgba(255,255,255,0.7);font-size:0.7rem;">SISTER-Clima v2.1</b><br>'
+        f'© 2026 Embrapa<br>'
+        f'Dados: <a href="https://open-meteo.com" target="_blank" style="color:#5ec8f5;">Open-Meteo API</a><br>'
+        f'<span style="font-size:0.65rem;opacity:0.6;">ERA5 Reanalysis (ECMWF) + NWP</span><br>'
+        f'<span style="font-size:0.65rem;opacity:0.55;">Atualizado em {agora}</span>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
 
 # ==========================================
 # CONTEÚDO PRINCIPAL
 # ==========================================
-st.markdown('<div class="main-title">🌧️ Monitoramento Climático</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Integração de dados via Open-Meteo API</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🌧️ SISTER-Clima | Monitoramento Climático</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Dados de precipitação via <a href="https://open-meteo.com" target="_blank" style="color:#2ea8e8;text-decoration:none;font-weight:700;">Open-Meteo API</a> &mdash; saída de modelo NWP e ERA5 Reanalysis (ECMWF)</div>', unsafe_allow_html=True)
 st.divider()
 
 if menu_selecionado == "🌎 Explorador Nacional":
     st.markdown("### Selecione a Região de Análise")
+    st.caption("⚠️ **Fonte dos dados:** Open-Meteo `/v1/forecast` — saída de modelo numérico de tempo (NWP). Não representa observação direta de estações.")
     
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
