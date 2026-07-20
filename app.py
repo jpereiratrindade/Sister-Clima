@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import os
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 st.set_page_config(page_title="SISTER-Clima | Resiliência Climática", layout="wide", page_icon="🌧️", initial_sidebar_state="expanded")
 
