@@ -5,9 +5,9 @@ import os
 import requests
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="Chuva Diária no Brasil", layout="wide", page_icon="🌧️")
+st.set_page_config(page_title="SISTER | Resiliência Climática", layout="wide", page_icon="🌧️")
 
-st.title("🌧️ Monitoramento de Precipitação")
+st.title("🌧️ SISTER | Painel de Resiliência Climática")
 st.markdown("Dados de chuva acumulada (mm) via Open-Meteo API.")
 
 # ---- Carregar Dados do IBGE via GitHub ----

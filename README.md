@@ -1,6 +1,6 @@
-# 🌧️ Open-Meteo Brasil Dashboard
+# 🌧️ SISTER | Painel de Resiliência Climática
 
-Bem-vindo ao repositório do **Open-Meteo Brasil Dashboard**! Este projeto é uma solução completa em Python para coletar, armazenar e visualizar dados de precipitação (chuva) utilizando a API gratuita do [Open-Meteo](https://open-meteo.com/).
+Bem-vindo ao repositório do **SISTER | Painel de Resiliência Climática**! Este projeto é uma solução completa em Python para coletar, armazenar e visualizar dados de precipitação (chuva) utilizando a API gratuita do [Open-Meteo](https://open-meteo.com/).
 
 O projeto é dividido em dois grandes pilares:
 1. **Automação de Coleta (GitHub Actions)**: Uma rotina diária que consulta a chuva acumulada para os principais municípios do Rio Grande do Sul (RS) e armazena os dados historicamente em um arquivo CSV.
