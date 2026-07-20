@@ -610,45 +610,49 @@ elif menu_selecionado == "📖 Sobre os Dados":
             "❌ Produto comercial / SaaS: **requer licença**"
         )
 
-    # ---- BLOCO 2: TIPOS DE DADO ----
+    # ---- BLOCO 2: TIPOS DE DADO E RESOLUÇÃO ----
     st.divider()
-    st.markdown("#### 🔬 NWP, ERA5 ou Observação Real — Qual a diferença?")
+    st.markdown("#### 🔬 NWP, Reanálise (MERRA-2/ERA5) ou Observação Real — Qual a diferença?")
+    st.markdown(
+        "Devido à natureza matemática dos modelos globais, **é esperado que haja forte discrepância entre os valores reportados por cada modelo** para o mesmo dia e local. Entenda o porquê:"
+    )
+    
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown("""
-**🟡 NWP — Modelo Numérico**
+**🟡 Modelo NWP (Open-Meteo)**
 *(Explorador Nacional)*
 
-Saída de modelos de previsão (ICON, GFS, ECMWF).
-O modelo simula a atmosfera com base em equações físicas.
+Modelos Numéricos de Tempo (ICON, GFS). Têm altíssima resolução, ideais para captar "células" isoladas de tempestade.
 
-- Dados de hoje e futuros
-- O que o modelo **calculou**
-- Endpoint: `/v1/forecast`
+- **Foco:** Previsão e picos extremos.
+- **Resolução Espacial:** ~7 a 11 km (pixel pequeno).
+- **Comportamento:** Consegue isolar temporais locais, mas tende a **superestimar** picos em dados passados.
+- **✅ Uso:** Defesa civil, risco pontual de alagamentos.
         """)
     with col2:
         st.markdown("""
-**🔵 ERA5 — Reanálise ECMWF**
-*(Coletor RS)*
+**🚀 Reanálise (NASA POWER / ERA5)**
+*(Operação Consolidada)*
 
-O modelo roda "para trás", assimilando dados históricos de satélites, radiossondas e estações.
+Olha para o passado assimilando satélites e estações reais. Tira grandes médias espaciais, "achatando" picos isolados.
 
-- Histórico desde 1940
-- Padrão-ouro em climatologia
-- Resolução: ~31 km
-- Endpoint: `/v1/archive`
+- **Foco:** Climatologia e agricultura.
+- **Resolução Espacial:** ~50 km (pixel enorme).
+- **Comportamento:** Excelente para volume total acumulado em bacias, mas dilui pancadas fortes isoladas.
+- **✅ Uso:** Agroclimatologia, balanço hídrico de bacias, análise sazonal.
         """)
     with col3:
         st.markdown("""
-**🟢 Observação Real**
-*(planejado — v3.0)*
+**🟢 Observação Real (INMET/ANA)**
+*(Planejado — v3.x)*
 
-Leitura direta de pluviômetros e estações automáticas (INMET, ANA).
+Leitura física direta de pluviômetros no terreno. É o dado exato que caiu naquele milímetro quadrado, sem estimativas.
 
-- Dado pontual e preciso
-- Verificável e rastreável
-- Fundamental para hidrologia
-- Fontes: INMET, ANA Hidroweb
+- **Foco:** Hidrologia precisa e perícia.
+- **Resolução:** Pontual (Local exato da estação).
+- **Comportamento:** O único dado "real". Depende de a chuva ter caído exatamente sobre a estação.
+- **✅ Uso:** Calibração de modelos, laudos, projetos de engenharia hídrica.
         """)
 
     # ---- BLOCO 3: COMPARAÇÃO ----
