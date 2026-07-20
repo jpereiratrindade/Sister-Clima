@@ -240,6 +240,18 @@ with st.sidebar:
             ultima_coleta = ultima_data.strftime("%d/%m/%Y")
         except Exception:
             ultima_coleta = "Erro ao ler"
+            
+    st.write("")
+    if st.button("🔄 Sincronizar GitHub", use_container_width=True, help="Baixa os dados mais recentes gerados pelo robô (Git Pull)"):
+        with st.spinner("Sincronizando..."):
+            import subprocess
+            try:
+                subprocess.run(["git", "pull", "--rebase"], check=True, capture_output=True)
+                st.success("Base local atualizada!")
+                import time; time.sleep(1)
+                st.rerun()
+            except Exception as e:
+                st.error("Erro na sincronização.")
     st.markdown(
         f'<div class="sidebar-footer-container">'
         f'<b style="color:rgba(255,255,255,0.7);font-size:0.7rem;">SISTER-Clima v2.3</b><br>'
