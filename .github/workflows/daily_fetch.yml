@@ -1,0 +1,34 @@
+name: Coleta Diária de Precipitação RS
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Executa diariamente às 06:00 UTC
+  workflow_dispatch: # Permite executar manualmente pelo painel do GitHub
+
+jobs:
+  run-coletor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permissão para commitar o CSV no repositório
+
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar Dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar Coletor de Chuva
+        run: python coletor.py
+
+      - name: Commitar e Fazer Push dos Dados Atualizados
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/chuva_diaria.csv
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: atualização automática da chuva acumulada" && git push)
