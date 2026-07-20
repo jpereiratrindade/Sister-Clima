@@ -227,7 +227,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-logo-text">Resiliência Climática</div>', unsafe_allow_html=True)
     menu_selecionado = st.radio(
         "Navegação:",
-        ["🌎 Explorador Nacional", "📊 Operação Consolidada"],
+        ["🌎 Explorador Nacional", "📊 Operação Consolidada", "📖 Sobre os Dados"],
         label_visibility="collapsed"
     )
     # Timestamp de última atualização (sem dependência externa)
@@ -477,3 +477,147 @@ elif menu_selecionado == "📊 Operação Consolidada":
                     )
                 fig_mapa.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=20, r=20, t=40, b=20))
                 st.plotly_chart(fig_mapa, use_container_width=True)
+
+elif menu_selecionado == "📖 Sobre os Dados":
+    st.markdown("### 📖 Transparência e Conformidade de Dados")
+    st.markdown("Documentação técnica sobre as fontes de dados, limitações e roadmap de evolução do SISTER-Clima.")
+
+    # ---- BLOCO 1: ALERTA DE CONFORMIDADE ----
+    st.divider()
+    st.markdown("#### ⚖️ Situação Atual — Open-Meteo API")
+    col_a, col_b = st.columns([1.2, 1])
+    with col_a:
+        st.error(
+            "**Restrição de Uso Comercial**\n\n"
+            "A [Open-Meteo API](https://open-meteo.com/) é gratuita **apenas para uso pessoal e não-comercial**. "
+            "Uso institucional, sistemas em produção ou aplicações comerciais requerem licença paga "
+            "([open-meteo.com/en/pricing](https://open-meteo.com/en/pricing)).\n\n"
+            "O SISTER-Clima v2.x utiliza Open-Meteo e, portanto, está autorizado apenas para **consumo particular e desenvolvimento**. "
+            "Para implantação institucional plena (Embrapa), é necessária a migração para fontes abertas irrestrictas."
+        )
+    with col_b:
+        st.info(
+            "**O que isso significa?**\n\n"
+            "✅ Uso pessoal e pesquisa: **liberado**\n\n"
+            "✅ Desenvolvimento e testes: **liberado**\n\n"
+            "⚠️ Sistema institucional interno: **verificar**\n\n"
+            "❌ Produto comercial / SaaS: **requer licença**"
+        )
+
+    # ---- BLOCO 2: TIPOS DE DADO ----
+    st.divider()
+    st.markdown("#### 🔬 NWP, ERA5 ou Observação Real — Qual a diferença?")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""
+**🟡 NWP — Modelo Numérico**
+*(Explorador Nacional)*
+
+Saída de modelos de previsão (ICON, GFS, ECMWF).
+O modelo simula a atmosfera com base em equações físicas.
+
+- Dados de hoje e futuros
+- O que o modelo **calculou**
+- Endpoint: `/v1/forecast`
+        """)
+    with col2:
+        st.markdown("""
+**🔵 ERA5 — Reanálise ECMWF**
+*(Coletor RS)*
+
+O modelo roda "para trás", assimilando dados históricos de satélites, radiossondas e estações.
+
+- Histórico desde 1940
+- Padrão-ouro em climatologia
+- Resolução: ~31 km
+- Endpoint: `/v1/archive`
+        """)
+    with col3:
+        st.markdown("""
+**🟢 Observação Real**
+*(planejado — v3.0)*
+
+Leitura direta de pluviômetros e estações automáticas (INMET, ANA).
+
+- Dado pontual e preciso
+- Verificável e rastreável
+- Fundamental para hidrologia
+- Fontes: INMET, ANA Hidroweb
+        """)
+
+    # ---- BLOCO 3: COMPARAÇÃO ----
+    st.divider()
+    st.markdown("#### 🗂️ Comparativo de Fontes de Dados")
+    df_fontes = pd.DataFrame({
+        "Fonte": ["Open-Meteo (NWP)", "Open-Meteo (ERA5)", "NASA POWER ⭐", "INMET BDMEP ⭐", "ANA Hidroweb ⭐"],
+        "Tipo": ["Modelo NWP", "Reanálise ERA5 ECMWF", "MERRA-2 NASA", "Observação real estação", "Pluviômetro hidrológico"],
+        "Cobertura": ["Global", "Global (1940-)", "Global (1981-)", "Brasil (estações INMET)", "Brasil (bacias)"],
+        "Chave API": ["❌ Nenhuma", "❌ Nenhuma", "❌ Nenhuma", "🔑 Token gratuito", "❌ Nenhuma"],
+        "Uso Comercial": ["❌ Pago", "❌ Pago", "✅ Irrestrito (NASA)", "✅ Público BR", "✅ Público BR"],
+        "Status": ["🟡 Em uso", "🟡 Em uso", "🔄 v3.0", "🔄 v3.0", "🔄 v3.1"]
+    })
+    st.dataframe(df_fontes, use_container_width=True, hide_index=True)
+    st.caption("⭐ Fontes recomendadas para implantação institucional plena")
+
+    # ---- BLOCO 4: ROADMAP ----
+    st.divider()
+    st.markdown("#### 🗺️ Roadmap — SISTER-Clima")
+    col_r1, col_r2, col_r3 = st.columns(3)
+    with col_r1:
+        st.markdown("""
+**🟡 v2.x — Atual**
+
+Open-Meteo API (NWP + ERA5)
+- ✅ Funcional para P&D
+- ⚠️ Licença restrita
+- 5.570 municípios via IBGE
+        """)
+    with col_r2:
+        st.markdown("""
+**🔵 v3.0 — Planejada**
+
+*NASA POWER API*
+- Sem chave, sem custo
+- Irrestrito (domínio público)
+- Parâmetros agronômicos
+- Ideal para missão Embrapa
+        """)
+    with col_r3:
+        st.markdown("""
+**🟢 v3.1 — Evolução**
+
+*INMET + ANA Hidroweb*
+- Observações reais de estações BR
+- Token gratuito INMET
+- Rede Hidroweb para bacias
+- Conformidade MAPA/ANA
+        """)
+
+    # ---- BLOCO 5: NASA POWER ----
+    st.divider()
+    st.markdown("#### 🚀 Por que NASA POWER para a próxima versão?")
+    col_nasa1, col_nasa2 = st.columns([1.5, 1])
+    with col_nasa1:
+        st.markdown(
+            "A [NASA POWER API](https://power.larc.nasa.gov/) foi desenvolvida pelo NASA Langley Research Center "
+            "para aplicações agrícolas e de energia renovável — **exatamente o domínio do Projeto Resiliência**.\n\n"
+            "- 🌐 **Totalmente gratuita e irrestrita** — domínio público da NASA\n"
+            "- 🌾 **Parâmetros agronômicos nativos**: evapotranspiração, umidade, temperatura\n"
+            "- 📅 **Histórico desde 1981** via MERRA-2\n"
+            "- 🗺️ Cobertura global (~50 km de resolução)\n"
+            "- 📖 Citação: *NASA LaRC POWER Project, NASA Earth Science/Applied Science Program*"
+        )
+    with col_nasa2:
+        st.code(
+            "# Endpoint — sem autenticação\n"
+            "GET power.larc.nasa.gov/api/\n"
+            "  temporal/daily/point\n"
+            "  ?parameters=PRECTOTCORR\n"
+            "  &community=AG\n"
+            "  &longitude=-51.2177\n"
+            "  &latitude=-30.0346\n"
+            "  &start=20240101\n"
+            "  &end=20240131\n"
+            "  &format=JSON",
+            language="text"
+        )
