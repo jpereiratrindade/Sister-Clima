@@ -1,11 +1,311 @@
-data,cidade,latitude,longitude,precipitacao_mm
-2026-07-19,Bagé,-31.3314,-54.1069,34.6
-2026-07-19,Caxias do Sul,-29.1681,-51.1794,8.3
-2026-07-19,Lajeado,-29.4669,-51.9614,9.4
-2026-07-19,Passo Fundo,-28.2625,-52.4083,7.0
-2026-07-19,Pelotas,-31.7654,-52.3376,35.1
-2026-07-19,Porto Alegre,-30.0346,-51.2177,7.1
-2026-07-19,Rio Grande,-32.035,-52.0986,36.5
-2026-07-19,Santa Cruz do Sul,-29.7186,-52.4311,28.0
-2026-07-19,Santa Maria,-29.6842,-53.8069,36.5
-2026-07-19,Uruguaiana,-29.7547,-57.0883,46.2
+data,cidade,latitude,longitude,precipitacao_mm,fonte
+2026-06-19,Bagé,-31.3314,-54.1069,7.2,Open-Meteo ERA5
+2026-06-19,Caxias do Sul,-29.1681,-51.1794,6.1,Open-Meteo ERA5
+2026-06-19,Lajeado,-29.4669,-51.9614,4.3,Open-Meteo ERA5
+2026-06-19,Passo Fundo,-28.2625,-52.4083,11.4,Open-Meteo ERA5
+2026-06-19,Pelotas,-31.7654,-52.3376,4.0,Open-Meteo ERA5
+2026-06-19,Porto Alegre,-30.0346,-51.2177,4.7,Open-Meteo ERA5
+2026-06-19,Rio Grande,-32.035,-52.0986,6.0,Open-Meteo ERA5
+2026-06-19,Santa Cruz do Sul,-29.7186,-52.4311,7.8,Open-Meteo ERA5
+2026-06-19,Santa Maria,-29.6842,-53.8069,9.7,Open-Meteo ERA5
+2026-06-19,Uruguaiana,-29.7547,-57.0883,10.6,Open-Meteo ERA5
+2026-06-20,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-20,Caxias do Sul,-29.1681,-51.1794,0.6,Open-Meteo ERA5
+2026-06-20,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-06-20,Passo Fundo,-28.2625,-52.4083,0.2,Open-Meteo ERA5
+2026-06-20,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-20,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-20,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-20,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-20,Santa Maria,-29.6842,-53.8069,0.1,Open-Meteo ERA5
+2026-06-20,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-06-21,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-21,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-06-21,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-06-21,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-06-21,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-21,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-21,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-21,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-21,Santa Maria,-29.6842,-53.8069,0.9,Open-Meteo ERA5
+2026-06-21,Uruguaiana,-29.7547,-57.0883,0.2,Open-Meteo ERA5
+2026-06-22,Bagé,-31.3314,-54.1069,4.2,Open-Meteo ERA5
+2026-06-22,Caxias do Sul,-29.1681,-51.1794,36.9,Open-Meteo ERA5
+2026-06-22,Lajeado,-29.4669,-51.9614,19.6,Open-Meteo ERA5
+2026-06-22,Passo Fundo,-28.2625,-52.4083,29.9,Open-Meteo ERA5
+2026-06-22,Pelotas,-31.7654,-52.3376,6.8,Open-Meteo ERA5
+2026-06-22,Porto Alegre,-30.0346,-51.2177,22.7,Open-Meteo ERA5
+2026-06-22,Rio Grande,-32.035,-52.0986,5.2,Open-Meteo ERA5
+2026-06-22,Santa Cruz do Sul,-29.7186,-52.4311,19.6,Open-Meteo ERA5
+2026-06-22,Santa Maria,-29.6842,-53.8069,17.2,Open-Meteo ERA5
+2026-06-22,Uruguaiana,-29.7547,-57.0883,1.0,Open-Meteo ERA5
+2026-06-23,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-23,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-06-23,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-06-23,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-06-23,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-23,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-23,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-23,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-23,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-06-23,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-06-24,Bagé,-31.3314,-54.1069,0.1,Open-Meteo ERA5
+2026-06-24,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-06-24,Lajeado,-29.4669,-51.9614,0.1,Open-Meteo ERA5
+2026-06-24,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-06-24,Pelotas,-31.7654,-52.3376,0.4,Open-Meteo ERA5
+2026-06-24,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-24,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-24,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-24,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-06-24,Uruguaiana,-29.7547,-57.0883,0.1,Open-Meteo ERA5
+2026-06-25,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-25,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-06-25,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-06-25,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-06-25,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-25,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-25,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-25,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-25,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-06-25,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-06-26,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-26,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-06-26,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-06-26,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-06-26,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-26,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-26,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-26,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-26,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-06-26,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-06-27,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-27,Caxias do Sul,-29.1681,-51.1794,1.1,Open-Meteo ERA5
+2026-06-27,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-06-27,Passo Fundo,-28.2625,-52.4083,1.4,Open-Meteo ERA5
+2026-06-27,Pelotas,-31.7654,-52.3376,2.9,Open-Meteo ERA5
+2026-06-27,Porto Alegre,-30.0346,-51.2177,0.3,Open-Meteo ERA5
+2026-06-27,Rio Grande,-32.035,-52.0986,0.9,Open-Meteo ERA5
+2026-06-27,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-27,Santa Maria,-29.6842,-53.8069,0.3,Open-Meteo ERA5
+2026-06-27,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-06-28,Bagé,-31.3314,-54.1069,6.5,Open-Meteo ERA5
+2026-06-28,Caxias do Sul,-29.1681,-51.1794,47.1,Open-Meteo ERA5
+2026-06-28,Lajeado,-29.4669,-51.9614,32.7,Open-Meteo ERA5
+2026-06-28,Passo Fundo,-28.2625,-52.4083,28.8,Open-Meteo ERA5
+2026-06-28,Pelotas,-31.7654,-52.3376,7.7,Open-Meteo ERA5
+2026-06-28,Porto Alegre,-30.0346,-51.2177,25.9,Open-Meteo ERA5
+2026-06-28,Rio Grande,-32.035,-52.0986,9.9,Open-Meteo ERA5
+2026-06-28,Santa Cruz do Sul,-29.7186,-52.4311,33.1,Open-Meteo ERA5
+2026-06-28,Santa Maria,-29.6842,-53.8069,34.8,Open-Meteo ERA5
+2026-06-28,Uruguaiana,-29.7547,-57.0883,3.1,Open-Meteo ERA5
+2026-06-29,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-29,Caxias do Sul,-29.1681,-51.1794,2.8,Open-Meteo ERA5
+2026-06-29,Lajeado,-29.4669,-51.9614,0.1,Open-Meteo ERA5
+2026-06-29,Passo Fundo,-28.2625,-52.4083,1.3,Open-Meteo ERA5
+2026-06-29,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-29,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-29,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-29,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-29,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-06-29,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-06-30,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-06-30,Caxias do Sul,-29.1681,-51.1794,2.9,Open-Meteo ERA5
+2026-06-30,Lajeado,-29.4669,-51.9614,0.3,Open-Meteo ERA5
+2026-06-30,Passo Fundo,-28.2625,-52.4083,4.5,Open-Meteo ERA5
+2026-06-30,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-06-30,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-06-30,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-06-30,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-06-30,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-06-30,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-01,Bagé,-31.3314,-54.1069,1.7,Open-Meteo ERA5
+2026-07-01,Caxias do Sul,-29.1681,-51.1794,9.7,Open-Meteo ERA5
+2026-07-01,Lajeado,-29.4669,-51.9614,3.2,Open-Meteo ERA5
+2026-07-01,Passo Fundo,-28.2625,-52.4083,21.3,Open-Meteo ERA5
+2026-07-01,Pelotas,-31.7654,-52.3376,0.7,Open-Meteo ERA5
+2026-07-01,Porto Alegre,-30.0346,-51.2177,5.7,Open-Meteo ERA5
+2026-07-01,Rio Grande,-32.035,-52.0986,0.8,Open-Meteo ERA5
+2026-07-01,Santa Cruz do Sul,-29.7186,-52.4311,3.2,Open-Meteo ERA5
+2026-07-01,Santa Maria,-29.6842,-53.8069,3.3,Open-Meteo ERA5
+2026-07-01,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-02,Bagé,-31.3314,-54.1069,2.6,Open-Meteo ERA5
+2026-07-02,Caxias do Sul,-29.1681,-51.1794,57.6,Open-Meteo ERA5
+2026-07-02,Lajeado,-29.4669,-51.9614,14.9,Open-Meteo ERA5
+2026-07-02,Passo Fundo,-28.2625,-52.4083,32.1,Open-Meteo ERA5
+2026-07-02,Pelotas,-31.7654,-52.3376,3.4,Open-Meteo ERA5
+2026-07-02,Porto Alegre,-30.0346,-51.2177,13.7,Open-Meteo ERA5
+2026-07-02,Rio Grande,-32.035,-52.0986,2.6,Open-Meteo ERA5
+2026-07-02,Santa Cruz do Sul,-29.7186,-52.4311,13.4,Open-Meteo ERA5
+2026-07-02,Santa Maria,-29.6842,-53.8069,6.8,Open-Meteo ERA5
+2026-07-02,Uruguaiana,-29.7547,-57.0883,0.2,Open-Meteo ERA5
+2026-07-03,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-03,Caxias do Sul,-29.1681,-51.1794,0.9,Open-Meteo ERA5
+2026-07-03,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-03,Passo Fundo,-28.2625,-52.4083,0.7,Open-Meteo ERA5
+2026-07-03,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-03,Porto Alegre,-30.0346,-51.2177,0.3,Open-Meteo ERA5
+2026-07-03,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-03,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-03,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-03,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-04,Bagé,-31.3314,-54.1069,0.1,Open-Meteo ERA5
+2026-07-04,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-04,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-04,Passo Fundo,-28.2625,-52.4083,0.8,Open-Meteo ERA5
+2026-07-04,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-04,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-04,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-04,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-04,Santa Maria,-29.6842,-53.8069,3.0,Open-Meteo ERA5
+2026-07-04,Uruguaiana,-29.7547,-57.0883,0.9,Open-Meteo ERA5
+2026-07-05,Bagé,-31.3314,-54.1069,2.8,Open-Meteo ERA5
+2026-07-05,Caxias do Sul,-29.1681,-51.1794,0.2,Open-Meteo ERA5
+2026-07-05,Lajeado,-29.4669,-51.9614,1.5,Open-Meteo ERA5
+2026-07-05,Passo Fundo,-28.2625,-52.4083,0.7,Open-Meteo ERA5
+2026-07-05,Pelotas,-31.7654,-52.3376,3.5,Open-Meteo ERA5
+2026-07-05,Porto Alegre,-30.0346,-51.2177,1.0,Open-Meteo ERA5
+2026-07-05,Rio Grande,-32.035,-52.0986,3.1,Open-Meteo ERA5
+2026-07-05,Santa Cruz do Sul,-29.7186,-52.4311,4.0,Open-Meteo ERA5
+2026-07-05,Santa Maria,-29.6842,-53.8069,5.6,Open-Meteo ERA5
+2026-07-05,Uruguaiana,-29.7547,-57.0883,0.3,Open-Meteo ERA5
+2026-07-06,Bagé,-31.3314,-54.1069,0.9,Open-Meteo ERA5
+2026-07-06,Caxias do Sul,-29.1681,-51.1794,5.0,Open-Meteo ERA5
+2026-07-06,Lajeado,-29.4669,-51.9614,0.7,Open-Meteo ERA5
+2026-07-06,Passo Fundo,-28.2625,-52.4083,2.7,Open-Meteo ERA5
+2026-07-06,Pelotas,-31.7654,-52.3376,1.2,Open-Meteo ERA5
+2026-07-06,Porto Alegre,-30.0346,-51.2177,16.1,Open-Meteo ERA5
+2026-07-06,Rio Grande,-32.035,-52.0986,0.9,Open-Meteo ERA5
+2026-07-06,Santa Cruz do Sul,-29.7186,-52.4311,0.3,Open-Meteo ERA5
+2026-07-06,Santa Maria,-29.6842,-53.8069,0.7,Open-Meteo ERA5
+2026-07-06,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-07,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-07,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-07,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-07,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-07,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-07,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-07,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-07,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-07,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-07,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-08,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-08,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-08,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-08,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-08,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-08,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-08,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-08,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-08,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-08,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-09,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-09,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-09,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-09,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-09,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-09,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-09,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-09,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-09,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-09,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-10,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-10,Caxias do Sul,-29.1681,-51.1794,2.3,Open-Meteo ERA5
+2026-07-10,Lajeado,-29.4669,-51.9614,11.3,Open-Meteo ERA5
+2026-07-10,Passo Fundo,-28.2625,-52.4083,38.2,Open-Meteo ERA5
+2026-07-10,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-10,Porto Alegre,-30.0346,-51.2177,0.2,Open-Meteo ERA5
+2026-07-10,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-10,Santa Cruz do Sul,-29.7186,-52.4311,0.2,Open-Meteo ERA5
+2026-07-10,Santa Maria,-29.6842,-53.8069,1.2,Open-Meteo ERA5
+2026-07-10,Uruguaiana,-29.7547,-57.0883,0.1,Open-Meteo ERA5
+2026-07-11,Bagé,-31.3314,-54.1069,2.1,Open-Meteo ERA5
+2026-07-11,Caxias do Sul,-29.1681,-51.1794,10.6,Open-Meteo ERA5
+2026-07-11,Lajeado,-29.4669,-51.9614,15.3,Open-Meteo ERA5
+2026-07-11,Passo Fundo,-28.2625,-52.4083,35.6,Open-Meteo ERA5
+2026-07-11,Pelotas,-31.7654,-52.3376,7.6,Open-Meteo ERA5
+2026-07-11,Porto Alegre,-30.0346,-51.2177,2.7,Open-Meteo ERA5
+2026-07-11,Rio Grande,-32.035,-52.0986,8.2,Open-Meteo ERA5
+2026-07-11,Santa Cruz do Sul,-29.7186,-52.4311,12.7,Open-Meteo ERA5
+2026-07-11,Santa Maria,-29.6842,-53.8069,16.8,Open-Meteo ERA5
+2026-07-11,Uruguaiana,-29.7547,-57.0883,0.4,Open-Meteo ERA5
+2026-07-12,Bagé,-31.3314,-54.1069,1.9,Open-Meteo ERA5
+2026-07-12,Caxias do Sul,-29.1681,-51.1794,5.4,Open-Meteo ERA5
+2026-07-12,Lajeado,-29.4669,-51.9614,0.4,Open-Meteo ERA5
+2026-07-12,Passo Fundo,-28.2625,-52.4083,1.3,Open-Meteo ERA5
+2026-07-12,Pelotas,-31.7654,-52.3376,5.0,Open-Meteo ERA5
+2026-07-12,Porto Alegre,-30.0346,-51.2177,2.6,Open-Meteo ERA5
+2026-07-12,Rio Grande,-32.035,-52.0986,3.4,Open-Meteo ERA5
+2026-07-12,Santa Cruz do Sul,-29.7186,-52.4311,1.1,Open-Meteo ERA5
+2026-07-12,Santa Maria,-29.6842,-53.8069,2.0,Open-Meteo ERA5
+2026-07-12,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-13,Bagé,-31.3314,-54.1069,0.3,Open-Meteo ERA5
+2026-07-13,Caxias do Sul,-29.1681,-51.1794,0.3,Open-Meteo ERA5
+2026-07-13,Lajeado,-29.4669,-51.9614,0.4,Open-Meteo ERA5
+2026-07-13,Passo Fundo,-28.2625,-52.4083,0.1,Open-Meteo ERA5
+2026-07-13,Pelotas,-31.7654,-52.3376,0.3,Open-Meteo ERA5
+2026-07-13,Porto Alegre,-30.0346,-51.2177,0.2,Open-Meteo ERA5
+2026-07-13,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-13,Santa Cruz do Sul,-29.7186,-52.4311,0.5,Open-Meteo ERA5
+2026-07-13,Santa Maria,-29.6842,-53.8069,0.2,Open-Meteo ERA5
+2026-07-13,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-14,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-14,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-14,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-14,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-14,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-14,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-14,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-14,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-14,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-14,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-15,Bagé,-31.3314,-54.1069,0.0,Open-Meteo ERA5
+2026-07-15,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-15,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-15,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-15,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-15,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-15,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-15,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-15,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-15,Uruguaiana,-29.7547,-57.0883,0.0,Open-Meteo ERA5
+2026-07-16,Bagé,-31.3314,-54.1069,1.2,Open-Meteo ERA5
+2026-07-16,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-16,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-16,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-16,Pelotas,-31.7654,-52.3376,0.0,Open-Meteo ERA5
+2026-07-16,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-16,Rio Grande,-32.035,-52.0986,0.0,Open-Meteo ERA5
+2026-07-16,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-16,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-16,Uruguaiana,-29.7547,-57.0883,7.0,Open-Meteo ERA5
+2026-07-17,Bagé,-31.3314,-54.1069,0.8,Open-Meteo ERA5
+2026-07-17,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-17,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-17,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-17,Pelotas,-31.7654,-52.3376,0.2,Open-Meteo ERA5
+2026-07-17,Porto Alegre,-30.0346,-51.2177,0.0,Open-Meteo ERA5
+2026-07-17,Rio Grande,-32.035,-52.0986,11.4,Open-Meteo ERA5
+2026-07-17,Santa Cruz do Sul,-29.7186,-52.4311,0.0,Open-Meteo ERA5
+2026-07-17,Santa Maria,-29.6842,-53.8069,0.0,Open-Meteo ERA5
+2026-07-17,Uruguaiana,-29.7547,-57.0883,0.1,Open-Meteo ERA5
+2026-07-18,Bagé,-31.3314,-54.1069,47.3,Open-Meteo ERA5
+2026-07-18,Caxias do Sul,-29.1681,-51.1794,0.0,Open-Meteo ERA5
+2026-07-18,Lajeado,-29.4669,-51.9614,0.0,Open-Meteo ERA5
+2026-07-18,Passo Fundo,-28.2625,-52.4083,0.0,Open-Meteo ERA5
+2026-07-18,Pelotas,-31.7654,-52.3376,32.4,Open-Meteo ERA5
+2026-07-18,Porto Alegre,-30.0346,-51.2177,0.6,Open-Meteo ERA5
+2026-07-18,Rio Grande,-32.035,-52.0986,21.9,Open-Meteo ERA5
+2026-07-18,Santa Cruz do Sul,-29.7186,-52.4311,0.3,Open-Meteo ERA5
+2026-07-18,Santa Maria,-29.6842,-53.8069,5.3,Open-Meteo ERA5
+2026-07-18,Uruguaiana,-29.7547,-57.0883,19.4,Open-Meteo ERA5
+2026-07-19,Bagé,-31.3314,-54.1069,34.6,Open-Meteo ERA5
+2026-07-19,Caxias do Sul,-29.1681,-51.1794,8.3,Open-Meteo ERA5
+2026-07-19,Lajeado,-29.4669,-51.9614,9.4,Open-Meteo ERA5
+2026-07-19,Passo Fundo,-28.2625,-52.4083,7.0,Open-Meteo ERA5
+2026-07-19,Pelotas,-31.7654,-52.3376,35.1,Open-Meteo ERA5
+2026-07-19,Porto Alegre,-30.0346,-51.2177,7.1,Open-Meteo ERA5
+2026-07-19,Rio Grande,-32.035,-52.0986,36.5,Open-Meteo ERA5
+2026-07-19,Santa Cruz do Sul,-29.7186,-52.4311,28.0,Open-Meteo ERA5
+2026-07-19,Santa Maria,-29.6842,-53.8069,36.5,Open-Meteo ERA5
+2026-07-19,Uruguaiana,-29.7547,-57.0883,46.2,Open-Meteo ERA5

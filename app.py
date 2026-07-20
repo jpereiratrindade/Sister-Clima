@@ -453,20 +453,14 @@ elif menu_selecionado == "📊 Operação Consolidada":
         df_municipios["nome_uf"] = df_municipios["nome"] + " (" + df_municipios["codigo_uf"].map(df_estados.set_index("codigo_uf")["uf"]) + ")"
 
         # ---- LINHA 1: Cidades + Fonte de Dados ----
-        col_sel1, col_sel2, col_sel3 = st.columns([2, 2, 1])
+        col_sel1, col_sel2 = st.columns([1, 1])
         with col_sel1:
             cidades_sel = st.multiselect("Cidades Ativas (Histórico):", options=sorted(df["cidade"].unique()), default=df["cidade"].unique())
         with col_sel2:
             cidades_extras_sel = st.multiselect(
                 "Adicionar Outros Municípios:",
                 options=sorted(df_municipios["nome_uf"].unique()),
-                help="Busca dados via API e plota junto com o histórico local."
-            )
-        with col_sel3:
-            fonte_cons = st.radio(
-                "Fonte (extras):",
-                ["🟡 Open-Meteo", "🚀 NASA POWER"],
-                help="Fonte usada para buscar os municípios extras em tempo real."
+                help="Busca dados históricos adicionais em tempo real (Open-Meteo Archive) e plota junto com os dados locais do RS."
             )
 
         # ---- LINHA 2: Seletor de Período ----
@@ -517,7 +511,7 @@ elif menu_selecionado == "📊 Operação Consolidada":
         # Buscar dados extras
         if cidades_extras_sel:
             extra_dfs = []
-            with st.spinner(f"Buscando via {'NASA POWER MERRA-2' if 'NASA POWER' in fonte_cons else 'Open-Meteo Archive'}..."):
+            with st.spinner("Buscando dados no Open-Meteo Archive..."):
                 for item in cidades_extras_sel:
                     cidade_info = df_municipios[df_municipios["nome_uf"] == item].iloc[0]
                     cidade_nome = cidade_info["nome"]
@@ -526,42 +520,24 @@ elif menu_selecionado == "📊 Operação Consolidada":
                     label = f"{cidade_nome} ({uf_label})"
 
                     try:
-                        if "NASA POWER" in fonte_cons:
-                            nasa_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
-                            nasa_params = {
-                                "parameters": "PRECTOTCORR", "community": "AG",
-                                "longitude": lon, "latitude": lat,
-                                "start": data_inicio.strftime("%Y%m%d"),
-                                "end": data_fim.strftime("%Y%m%d"),
-                                "format": "JSON"
-                            }
-                            res = requests.get(nasa_url, params=nasa_params, timeout=20)
-                            res.raise_for_status()
-                            raw = res.json()["properties"]["parameter"]["PRECTOTCORR"]
-                            df_extra = pd.DataFrame([
-                                {"cidade": label, "data": pd.to_datetime(k, format="%Y%m%d"),
-                                 "precipitacao_mm": max(v, 0.0), "latitude": lat, "longitude": lon}
-                                for k, v in raw.items()
-                            ])
-                        else:
-                            archive_url = "https://archive-api.open-meteo.com/v1/archive"
-                            params = {
-                                "latitude": lat, "longitude": lon,
-                                "start_date": data_inicio.strftime("%Y-%m-%d"),
-                                "end_date": data_fim.strftime("%Y-%m-%d"),
-                                "daily": "precipitation_sum", "timezone": "America/Sao_Paulo"
-                            }
-                            res = requests.get(archive_url, params=params, timeout=12)
-                            res.raise_for_status()
-                            data_api = res.json()
-                            df_extra = pd.DataFrame({
-                                "cidade": [label] * len(data_api["daily"]["time"]),
-                                "data": pd.to_datetime(data_api["daily"]["time"]),
-                                "precipitacao_mm": data_api["daily"]["precipitation_sum"],
-                                "latitude": [lat] * len(data_api["daily"]["time"]),
-                                "longitude": [lon] * len(data_api["daily"]["time"])
-                            })
-                            df_extra["precipitacao_mm"] = df_extra["precipitacao_mm"].fillna(0.0)
+                        archive_url = "https://archive-api.open-meteo.com/v1/archive"
+                        params = {
+                            "latitude": lat, "longitude": lon,
+                            "start_date": data_inicio.strftime("%Y-%m-%d"),
+                            "end_date": data_fim.strftime("%Y-%m-%d"),
+                            "daily": "precipitation_sum", "timezone": "America/Sao_Paulo"
+                        }
+                        res = requests.get(archive_url, params=params, timeout=12)
+                        res.raise_for_status()
+                        data_api = res.json()
+                        df_extra = pd.DataFrame({
+                            "cidade": [label] * len(data_api["daily"]["time"]),
+                            "data": pd.to_datetime(data_api["daily"]["time"]),
+                            "precipitacao_mm": data_api["daily"]["precipitation_sum"],
+                            "latitude": [lat] * len(data_api["daily"]["time"]),
+                            "longitude": [lon] * len(data_api["daily"]["time"])
+                        })
+                        df_extra["precipitacao_mm"] = df_extra["precipitacao_mm"].fillna(0.0)
 
                         extra_dfs.append(df_extra)
                     except Exception as e:
