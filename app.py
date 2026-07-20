@@ -5,13 +5,33 @@ import os
 import requests
 from datetime import datetime, timedelta
 
-# Configuração da Página
-st.set_page_config(page_title="SISTER | Resiliência Climática", layout="wide", page_icon="🌧️")
+st.set_page_config(page_title="SISTER | Resiliência Climática", layout="wide", page_icon="🌧️", initial_sidebar_state="expanded")
 
-# Injeção de CSS Customizado para identidade do SISTER
+# Injeção de CSS Customizado
 custom_css = """
 <style>
-/* Fundo principal e fontes globais gerenciadas pelo config.toml */
+/* Sidebar Dark Blue Background */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0c2844, #071e38) !important;
+}
+/* Sidebar Texts to White */
+[data-testid="stSidebar"] .css-17lntkn, 
+[data-testid="stSidebar"] p, 
+[data-testid="stSidebar"] div, 
+[data-testid="stSidebar"] span, 
+[data-testid="stSidebar"] label {
+    color: #daeaf8 !important;
+}
+/* Radio buttons inside sidebar */
+div[role="radiogroup"] label {
+    background-color: transparent !important;
+    padding: 10px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+div[role="radiogroup"] label:hover {
+    background-color: rgba(255,255,255,0.07) !important;
+}
 
 /* Customização dos Cards de Métricas (stMetric) */
 [data-testid="stMetric"] {
@@ -35,7 +55,7 @@ custom_css = """
     color: #0f172a;
 }
 
-/* Títulos do Topbar */
+/* Títulos Principais */
 .main-title {
     font-size: 2.2rem;
     font-weight: 800;
@@ -47,31 +67,23 @@ custom_css = """
     color: #64748b;
     margin-bottom: 20px;
 }
-
-/* Abas */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 20px;
+.sidebar-logo-text {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
 }
-.stTabs [data-baseweb="tab"] {
-    height: 50px;
-    white-space: pre-wrap;
-    background-color: transparent;
-    border-radius: 4px 4px 0px 0px;
-    gap: 1px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    color: #64748b;
-}
-.stTabs [aria-selected="true"] {
-    color: #0c2844 !important;
-    font-weight: 700 !important;
+.sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    padding: 0 20px;
 }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-
-st.markdown('<div class="main-title">🌧️ SISTER | Painel de Resiliência Climática</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Monitoramento Analítico de Precipitação via Open-Meteo API</div>', unsafe_allow_html=True)
 
 # ---- Carregar Dados do IBGE via GitHub ----
 @st.cache_data(ttl=24*3600)
@@ -89,12 +101,26 @@ def load_municipios():
 df_estados = load_estados()
 df_municipios = load_municipios()
 
-tab1, tab2 = st.tabs(["🌎 Explorador Nacional (Tempo Real)", "📊 Operação Consolidada (RS)"])
+# ==========================================
+# SIDEBAR (Navegação)
+# ==========================================
+with st.sidebar:
+    st.markdown('<div class="sidebar-logo-text">SISTER</div>', unsafe_allow_html=True)
+    menu_selecionado = st.radio(
+        "Navegação:",
+        ["🌎 Explorador Nacional", "📊 Operação Consolidada"],
+        label_visibility="collapsed"
+    )
+    st.markdown('<div class="sidebar-footer">© 2026 Embrapa<br>Painel de Resiliência Climática v2.0</div>', unsafe_allow_html=True)
 
 # ==========================================
-# ABA 1: Explorador Nacional
+# CONTEÚDO PRINCIPAL
 # ==========================================
-with tab1:
+st.markdown('<div class="main-title">🌧️ Monitoramento Climático</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Integração de dados via Open-Meteo API</div>', unsafe_allow_html=True)
+st.divider()
+
+if menu_selecionado == "🌎 Explorador Nacional":
     st.markdown("### Selecione a Região de Análise")
     
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -148,7 +174,7 @@ with tab1:
             df_live["Intensidade"] = df_live["Chuva (mm)"].apply(categorizar_chuva)
 
             st.divider()
-            st.markdown(f"### Painel de Diagnóstico: **{municipio_sel_nome} - {estado_sel_nome}**")
+            st.markdown(f"#### Diagnóstico: **{municipio_sel_nome} - {estado_sel_nome}**")
             
             # --- ROW 1: CARDS (KPIs) ---
             kpi1, kpi2, kpi3, kpi4 = st.columns(4)
@@ -164,7 +190,7 @@ with tab1:
             with col_chart1:
                 fig1 = px.bar(
                     df_live, x="Data", y="Chuva (mm)", 
-                    title="Distribuição Diária de Precipitação",
+                    title="Distribuição Diária",
                     template="plotly_white",
                     color_discrete_sequence=["#2ea8e8"]
                 )
@@ -176,7 +202,8 @@ with tab1:
                     df_live, x="Data", y="Acumulado (mm)", 
                     title="Curva de Acúmulo Mensal",
                     template="plotly_white",
-                    color_discrete_sequence=["#f59e0b"]
+                    color_discrete_sequence=["#f59e0b"],
+                    markers=True
                 )
                 fig2.update_traces(fill='tozeroy', fillcolor="rgba(245, 158, 11, 0.1)")
                 fig2.update_layout(margin=dict(l=20, r=20, t=40, b=20), plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
@@ -206,10 +233,7 @@ with tab1:
         except Exception as e:
             st.error(f"Erro na comunicação com a API: {e}")
 
-# ==========================================
-# ABA 2: Dados Históricos do RS
-# ==========================================
-with tab2:
+elif menu_selecionado == "📊 Operação Consolidada":
     st.markdown("### Controle Base Operacional - Rio Grande do Sul")
     st.markdown("Gestão dos dados salvos no repositório pela rotina de automação `daily_fetch`.")
     
@@ -242,8 +266,12 @@ with tab2:
             st.write("")
             col_chart, col_map = st.columns(2)
             with col_chart:
-                fig_linha = px.line(df_filtrado, x="data", y="precipitacao_mm", color="cidade", title="Evolução Temporal Comparativa", template="plotly_white")
-                fig_linha.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+                fig_linha = px.line(
+                    df_filtrado, x="data", y="precipitacao_mm", color="cidade", 
+                    title="Evolução Temporal Comparativa", template="plotly_white",
+                    markers=True
+                )
+                fig_linha.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=20, r=20, t=40, b=20))
                 st.plotly_chart(fig_linha, use_container_width=True)
 
             with col_map:
@@ -259,5 +287,5 @@ with tab2:
                         hover_name="cidade", hover_data=["data", "precipitacao_mm"], color_continuous_scale="Blues",
                         size_max=35, zoom=5.5, title="Mapa de Volume Espacial", mapbox_style="open-street-map"
                     )
-                fig_mapa.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
+                fig_mapa.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=20, r=20, t=40, b=20))
                 st.plotly_chart(fig_mapa, use_container_width=True)
