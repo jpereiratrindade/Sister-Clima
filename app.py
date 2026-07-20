@@ -197,7 +197,7 @@ st.markdown("""
       <span class="brand-main">Clima</span>
     </div>
   </div>
-  <div class="topbar-center">SISTER-Clima | Painel de Resiliência Climática | Dados via <a href="https://open-meteo.com" target="_blank" style="color:#5ec8f5;text-decoration:none;font-weight:800;">Open-Meteo API</a></div>
+  <div class="topbar-center">SISTER-Clima | Painel de Resiliência Climática | Monitoramento Pluviométrico</div>
   <div class="topbar-right">
     <a href="https://github.com/jpereiratrindade/Sister-Clima" target="_blank" class="topbar-btn">Repositório GitHub</a>
   </div>
@@ -242,11 +242,12 @@ with st.sidebar:
             ultima_coleta = "Erro ao ler"
     st.markdown(
         f'<div class="sidebar-footer-container">'
-        f'<b style="color:rgba(255,255,255,0.7);font-size:0.7rem;">SISTER-Clima v2.1</b><br>'
+        f'<b style="color:rgba(255,255,255,0.7);font-size:0.7rem;">SISTER-Clima v2.3</b><br>'
         f'© 2026 Embrapa<br>'
-        f'Dados: <a href="https://open-meteo.com" target="_blank" style="color:#5ec8f5;">Open-Meteo API</a><br>'
-        f'<span style="font-size:0.65rem;opacity:0.6;">ERA5 Reanalysis (ECMWF) + NWP</span><br>'
-        f'<span style="font-size:0.65rem;opacity:0.55;">Coleta: {ultima_coleta}</span>'
+        f'Fontes: <a href="https://open-meteo.com" target="_blank" style="color:#5ec8f5;">Open-Meteo</a>'
+        f' &amp; <a href="https://power.larc.nasa.gov" target="_blank" style="color:#5ec8f5;">NASA POWER</a><br>'
+        f'<span style="font-size:0.65rem;opacity:0.6;">NWP · ERA5 · MERRA-2</span><br>'
+        f'<span style="font-size:0.65rem;opacity:0.55;">Coleta RS: {ultima_coleta}</span>'
         f'</div>',
         unsafe_allow_html=True
     )
@@ -255,7 +256,7 @@ with st.sidebar:
 # CONTEÚDO PRINCIPAL
 # ==========================================
 st.markdown('<div class="main-title">🌧️ SISTER-Clima | Monitoramento Climático</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Dados de precipitação via <a href="https://open-meteo.com" target="_blank" style="color:#2ea8e8;text-decoration:none;font-weight:700;">Open-Meteo API</a> &mdash; saída de modelo NWP e ERA5 Reanalysis (ECMWF)</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Monitoramento pluviométrico com múltiplas fontes de dados &mdash; <a href="https://open-meteo.com" target="_blank" style="color:#2ea8e8;text-decoration:none;font-weight:700;">Open-Meteo</a> (NWP · ERA5) e <a href="https://power.larc.nasa.gov" target="_blank" style="color:#2ea8e8;text-decoration:none;font-weight:700;">NASA POWER</a> (MERRA-2)</div>', unsafe_allow_html=True)
 st.divider()
 
 if menu_selecionado == "🌎 Explorador Nacional":
@@ -278,11 +279,38 @@ if menu_selecionado == "🌎 Explorador Nacional":
 
     buscar = st.button("Gerar Relatório (Últimos 30 dias)", type="primary", use_container_width=True)
 
-    # Nota sobre a fonte selecionada
+    # Card descritivo da fonte selecionada
     if "NASA POWER" in fonte_dados:
-        st.caption("🚀 **NASA POWER MERRA-2** — Dado de domínio público, uso irrestrito (comercial/institucional). Fonte: NASA Langley Research Center.")
+        with st.expander("🚀 NASA POWER MERRA-2 — Uso irrestrito", expanded=True):
+            col_desc1, col_desc2 = st.columns([2, 1])
+            with col_desc1:
+                st.markdown(
+                    "**O que é o NASA POWER?**\n\n"
+                    "A [NASA POWER API](https://power.larc.nasa.gov/) (Prediction Of Worldwide Energy Resources) "
+                    "fornece dados meteorológicos derivados do modelo **MERRA-2** (Modern-Era Retrospective Analysis for Research and Applications). "
+                    "É um produto de reanálise da NASA que assimila observações de satélites e estações para reconstruir o estado da atmosfera.\n\n"
+                    "**Vantagens:**\n"
+                    "- 🟢 **Licença irrestrita** — domínio público NASA, uso comercial e institucional liberado\n"
+                    "- 🔑 **Sem chave de API** — acesso direto, sem cadastro\n"
+                    "- 🌾 **Parâmetros agronômicos** — evapotranspiração, umidade, temperatura do solo\n"
+                    "- 📅 **Histórico desde 1981** com resolução diária global\n"
+                    "- 📍 Resolução espacial: ~0.5° × 0.625° (~50–70 km)"
+                )
+            with col_desc2:
+                st.markdown("**Parâmetro utilizado:**")
+                st.code("PRECTOTCORR\n(Precipitação Corrigida\nmm/dia)", language="text")
+                st.markdown("⚠️ **Nota técnica:** MERRA-2 é reanálise, não observação direta de estação.", unsafe_allow_html=False)
     else:
-        st.caption("⚠️ **Open-Meteo NWP** — Saída de modelo numérico. Livre para pesquisa e desenvolvimento. Uso comercial requer licença.")
+        with st.expander("🟡 Open-Meteo NWP — Pesquisa e desenvolvimento", expanded=False):
+            st.markdown(
+                "**O que é o Open-Meteo NWP?**\n\n"
+                "A [Open-Meteo API](https://open-meteo.com/) fornece saída de **modelos numéricos de tempo** (NWP) como ICON (DWD), "
+                "GFS (NOAA) e ECMWF, além de dados históricos via ERA5 Reanalysis.\n\n"
+                "⚠️ **Licença:** gratuito para uso **pessoal e não-comercial**. Uso institucional/comercial requer "
+                "[plano pago](https://open-meteo.com/en/pricing).\n\n"
+                "O parâmetro `precipitation_sum` representa a precipitação acumulada diária estimada pelo modelo, "
+                "não uma observação direta de pluviometria."
+            )
 
     if buscar:
         cidade_info = lista_municipios[lista_municipios["nome"] == municipio_sel_nome].iloc[0]
