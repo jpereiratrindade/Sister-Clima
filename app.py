@@ -230,20 +230,23 @@ with st.sidebar:
         ["🌎 Explorador Nacional", "📊 Operação Consolidada", "📖 Sobre os Dados"],
         label_visibility="collapsed"
     )
-    # Timestamp de última atualização (sem dependência externa)
-    from datetime import datetime
-    from zoneinfo import ZoneInfo
-    try:
-        agora = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y às %H:%Mh")
-    except Exception:
-        agora = datetime.now().strftime("%d/%m/%Y às %H:%Mh")
+    # Timestamp = data da última coleta real (última entrada do CSV)
+    ultima_coleta = "Sem dados ainda"
+    CSV_PATH_CHECK = "data/chuva_diaria.csv"
+    if os.path.exists(CSV_PATH_CHECK):
+        try:
+            df_check = pd.read_csv(CSV_PATH_CHECK, usecols=["data"])
+            ultima_data = pd.to_datetime(df_check["data"]).max()
+            ultima_coleta = ultima_data.strftime("%d/%m/%Y")
+        except Exception:
+            ultima_coleta = "Erro ao ler"
     st.markdown(
         f'<div class="sidebar-footer-container">'
         f'<b style="color:rgba(255,255,255,0.7);font-size:0.7rem;">SISTER-Clima v2.1</b><br>'
         f'© 2026 Embrapa<br>'
         f'Dados: <a href="https://open-meteo.com" target="_blank" style="color:#5ec8f5;">Open-Meteo API</a><br>'
         f'<span style="font-size:0.65rem;opacity:0.6;">ERA5 Reanalysis (ECMWF) + NWP</span><br>'
-        f'<span style="font-size:0.65rem;opacity:0.55;">Atualizado em {agora}</span>'
+        f'<span style="font-size:0.65rem;opacity:0.55;">Coleta: {ultima_coleta}</span>'
         f'</div>',
         unsafe_allow_html=True
     )
