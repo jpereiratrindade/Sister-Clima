@@ -260,60 +260,98 @@ st.divider()
 
 if menu_selecionado == "🌎 Explorador Nacional":
     st.markdown("### Selecione a Região de Análise")
-    st.caption("⚠️ **Fonte dos dados:** Open-Meteo `/v1/forecast` — saída de modelo numérico de tempo (NWP). Não representa observação direta de estações.")
-    
+
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         lista_estados = df_estados.sort_values("nome")
         estado_sel_nome = st.selectbox("Estado (UF):", lista_estados["nome"])
-        
     with col2:
         uf_id = lista_estados[lista_estados["nome"] == estado_sel_nome]["codigo_uf"].values[0]
         lista_municipios = df_municipios[df_municipios["codigo_uf"] == uf_id].sort_values("nome")
         municipio_sel_nome = st.selectbox("Município:", lista_municipios["nome"])
-        
     with col3:
-        st.write("")
-        st.write("")
-        buscar = st.button("Gerar Relatório (Últimos 30 dias)", type="primary", use_container_width=True)
+        fonte_dados = st.radio(
+            "Fonte de Dados:",
+            ["🟡 Open-Meteo (NWP)", "🚀 NASA POWER (MERRA-2)"],
+            help="Open-Meteo: livre para pesquisa. NASA POWER: domínio público, irrestrito para qualquer uso."
+        )
+
+    buscar = st.button("Gerar Relatório (Últimos 30 dias)", type="primary", use_container_width=True)
+
+    # Nota sobre a fonte selecionada
+    if "NASA POWER" in fonte_dados:
+        st.caption("🚀 **NASA POWER MERRA-2** — Dado de domínio público, uso irrestrito (comercial/institucional). Fonte: NASA Langley Research Center.")
+    else:
+        st.caption("⚠️ **Open-Meteo NWP** — Saída de modelo numérico. Livre para pesquisa e desenvolvimento. Uso comercial requer licença.")
 
     if buscar:
         cidade_info = lista_municipios[lista_municipios["nome"] == municipio_sel_nome].iloc[0]
         lat, lon = cidade_info["latitude"], cidade_info["longitude"]
 
-        end_date = datetime.now().strftime("%Y-%m-%d")
-        start_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": lat, "longitude": lon,
-            "daily": "precipitation_sum", "timezone": "America/Sao_Paulo",
-            "start_date": start_date, "end_date": end_date
-        }
+        end_dt = datetime.now()
+        start_dt = end_dt - timedelta(days=30)
 
         try:
-            res = requests.get(url, params=params, timeout=15)
-            res.raise_for_status()
-            data = res.json()
-            
-            df_live = pd.DataFrame({
-                "Data": data["daily"]["time"], 
-                "Chuva (mm)": data["daily"]["precipitation_sum"]
-            })
-            df_live["Data"] = pd.to_datetime(df_live["Data"])
-            df_live["Chuva (mm)"] = df_live["Chuva (mm)"].fillna(0.0)
+            if "NASA POWER" in fonte_dados:
+                # ---- NASA POWER API (MERRA-2, sem chave, irrestrito) ----
+                nasa_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
+                nasa_params = {
+                    "parameters": "PRECTOTCORR",
+                    "community": "AG",
+                    "longitude": lon,
+                    "latitude": lat,
+                    "start": start_dt.strftime("%Y%m%d"),
+                    "end": end_dt.strftime("%Y%m%d"),
+                    "format": "JSON"
+                }
+                res = requests.get(nasa_url, params=nasa_params, timeout=20)
+                res.raise_for_status()
+                data = res.json()
+                raw = data["properties"]["parameter"]["PRECTOTCORR"]
+                df_live = pd.DataFrame([
+                    {"Data": pd.to_datetime(k, format="%Y%m%d"), "Chuva (mm)": max(v, 0.0)}
+                    for k, v in raw.items()
+                ]).sort_values("Data").reset_index(drop=True)
+                fonte_label = "NASA POWER MERRA-2"
+                fonte_badge = "🚀"
+            else:
+                # ---- Open-Meteo NWP ----
+                url = "https://api.open-meteo.com/v1/forecast"
+                params = {
+                    "latitude": lat, "longitude": lon,
+                    "daily": "precipitation_sum", "timezone": "America/Sao_Paulo",
+                    "start_date": start_dt.strftime("%Y-%m-%d"),
+                    "end_date": end_dt.strftime("%Y-%m-%d")
+                }
+                res = requests.get(url, params=params, timeout=15)
+                res.raise_for_status()
+                data = res.json()
+                df_live = pd.DataFrame({
+                    "Data": data["daily"]["time"],
+                    "Chuva (mm)": data["daily"]["precipitation_sum"]
+                })
+                df_live["Data"] = pd.to_datetime(df_live["Data"])
+                df_live["Chuva (mm)"] = df_live["Chuva (mm)"].fillna(0.0)
+                fonte_label = "Open-Meteo NWP"
+                fonte_badge = "🟡"
+
             df_live["Acumulado (mm)"] = df_live["Chuva (mm)"].cumsum()
-            
+
             def categorizar_chuva(mm):
                 if mm < 1: return "Sem Chuva"
                 elif mm < 10: return "Leve (1-10mm)"
                 elif mm < 25: return "Moderada (10-25mm)"
                 else: return "Forte (>25mm)"
-                
+
             df_live["Intensidade"] = df_live["Chuva (mm)"].apply(categorizar_chuva)
 
+
             st.divider()
-            st.markdown(f"#### Diagnóstico: **{municipio_sel_nome} - {estado_sel_nome}**")
+            col_diag, col_fonte = st.columns([2, 1])
+            with col_diag:
+                st.markdown(f"#### Diagnóstico: **{municipio_sel_nome} - {estado_sel_nome}**")
+            with col_fonte:
+                st.markdown(f"<div style='text-align:right;padding-top:8px;font-size:0.8rem;color:#64748b;'>{fonte_badge} Fonte: <b>{fonte_label}</b></div>", unsafe_allow_html=True)
             
             # --- ROW 1: CARDS (KPIs) ---
             kpi1, kpi2, kpi3, kpi4 = st.columns(4)
