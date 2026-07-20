@@ -91,11 +91,24 @@ header[data-testid="stHeader"] {
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0c2844, #071e38) !important;
 }
-/* Forçar Posição Relativa e Margem no Rodapé */
+/* Sidebar: estrutura flex para empurrar o footer */
+[data-testid="stSidebar"] > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
 [data-testid="stSidebarUserContent"] {
-    position: relative !important;
-    padding-bottom: 80px !important;
-    min-height: calc(100vh - 70px) !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 10px !important;
+}
+.sidebar-footer-container {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
 }
 
 /* Textos da Sidebar para Branco/Azul Claro */
@@ -155,20 +168,17 @@ div[role="radiogroup"] label:hover {
     font-size: 1.15rem;
     font-weight: 800;
     color: #ffffff;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     line-height: 1.25;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     padding-bottom: 10px;
 }
 .sidebar-footer-container {
-    position: absolute !important;
-    bottom: 10px !important;
-    left: 10px !important;
-    right: 10px !important;
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.45);
     border-top: 1px solid rgba(255,255,255,0.06);
-    padding-top: 10px;
+    padding: 12px 10px 10px 10px;
+    line-height: 1.5;
 }
 </style>
 """
