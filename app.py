@@ -29,6 +29,11 @@ header[data-testid="stHeader"] {
     border-bottom: 1px solid rgba(255,255,255,.08);
     z-index: 999999;
 }
+.mini-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .brand-container {
     display: flex;
     flex-direction: column;
@@ -86,6 +91,13 @@ header[data-testid="stHeader"] {
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0c2844, #071e38) !important;
 }
+/* Forçar Flexbox na Sidebar para empurrar o Rodapé */
+[data-testid="stSidebarUserContent"] {
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 80px) !important;
+}
+
 /* Textos da Sidebar para Branco/Azul Claro */
 [data-testid="stSidebar"] .css-17lntkn, 
 [data-testid="stSidebar"] p, 
@@ -147,23 +159,28 @@ div[role="radiogroup"] label:hover {
     letter-spacing: 2px;
 }
 .sidebar-footer-container {
-    margin-top: 150px;
+    margin-top: auto !important;
     font-size: 0.75rem;
     color: rgba(255,255,255,0.5);
-    padding: 0 10px;
+    padding: 15px 10px 10px 10px;
     border-top: 1px solid rgba(255,255,255,0.06);
-    padding-top: 15px;
 }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# Renderizar a Barra Superior (Topbar) SISTER
+# Renderizar a Barra Superior (Topbar) SISTER com Logo Oficial
 st.markdown("""
 <div class="app-topbar">
-  <div class="brand-container">
-    <span class="brand-super">RESILIÊNCIA</span>
-    <span class="brand-main">Clima v2</span>
+  <div class="mini-brand">
+    <svg viewBox="0 0 64 64" aria-hidden="true" style="width:32px;height:32px;color:#2ea8e8;fill:none;stroke:currentColor;stroke-width:2.8;filter:drop-shadow(0 0 6px rgba(46,168,232,.38));">
+      <g fill="none" stroke="currentColor" stroke-width="2.8"><path d="M32 5 55 18v28L32 59 9 46V18z"/><path d="M32 5v54M9 18l46 28M55 18 9 46"/></g>
+      <g fill="currentColor"><circle cx="32" cy="5" r="4"/><circle cx="55" cy="18" r="4"/><circle cx="55" cy="46" r="4"/><circle cx="32" cy="59" r="4"/><circle cx="9" cy="46" r="4"/><circle cx="9" cy="18" r="4"/><circle cx="32" cy="32" r="5"/></g>
+    </svg>
+    <div class="brand-container">
+      <span class="brand-super">RESILIÊNCIA</span>
+      <span class="brand-main">Clima v2</span>
+    </div>
   </div>
   <div class="topbar-center">SISTER | Painel de Resiliência Climática</div>
   <div class="topbar-right">
