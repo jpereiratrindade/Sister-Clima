@@ -432,7 +432,13 @@ if menu_selecionado == "🌎 Explorador Nacional":
             with col_table:
                 st.markdown("**Registro Analítico Diário**")
                 st.dataframe(
-                    df_live.sort_values(by="Data", ascending=False).style.format({"Chuva (mm)": "{:.1f}", "Acumulado (mm)":elif menu_selecionado == "📊 Operação Consolidada":
+                    df_live.sort_values(by="Data", ascending=False).style.format({"Chuva (mm)": "{:.1f}", "Acumulado (mm)": "{:.1f}"}),
+                    use_container_width=True, height=300
+                )
+        except Exception as e:
+            st.error(f"Erro na comunicação com a API: {e}")
+
+elif menu_selecionado == "📊 Operação Consolidada":
     st.markdown("### Controle Base Operacional - Rio Grande do Sul")
     st.markdown("Gestão dos dados salvos no repositório pela rotina de automação `daily_fetch`.")
 
