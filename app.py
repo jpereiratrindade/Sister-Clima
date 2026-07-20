@@ -10,11 +10,83 @@ st.set_page_config(page_title="SISTER | Resiliência Climática", layout="wide",
 # Injeção de CSS Customizado
 custom_css = """
 <style>
+/* Ocultar o header padrão do Streamlit */
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+
+/* Barra de Navegação Superior Fixa (Topbar) */
+.app-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    background: linear-gradient(90deg, #071e38, #0c2844 60%, #071e38);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    z-index: 999999;
+}
+.brand-container {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.brand-super {
+    color: #2ea8e8;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+.brand-main {
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+.topbar-center {
+    flex: 1;
+    color: rgba(218,234,248,.58);
+    font-size: .73rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-align: center;
+}
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.topbar-btn {
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 999px;
+    color: rgba(218,234,248,.84) !important;
+    font-size: .7rem;
+    font-weight: 800;
+    padding: 5px 15px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.topbar-btn:hover {
+    background: rgba(255,255,255,.08);
+    color: #ffffff !important;
+}
+
+/* Ajustes de Padding para compensar a Topbar */
+.main .block-container {
+    padding-top: 80px !important;
+}
+[data-testid="stSidebar"] {
+    padding-top: 56px !important;
+}
+
 /* Sidebar Dark Blue Background */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0c2844, #071e38) !important;
 }
-/* Sidebar Texts to White */
+/* Textos da Sidebar para Branco/Azul Claro */
 [data-testid="stSidebar"] .css-17lntkn, 
 [data-testid="stSidebar"] p, 
 [data-testid="stSidebar"] div, 
@@ -22,7 +94,7 @@ custom_css = """
 [data-testid="stSidebar"] label {
     color: #daeaf8 !important;
 }
-/* Radio buttons inside sidebar */
+/* Customização dos Radio Buttons na Sidebar */
 div[role="radiogroup"] label {
     background-color: transparent !important;
     padding: 10px;
@@ -55,7 +127,7 @@ div[role="radiogroup"] label:hover {
     color: #0f172a;
 }
 
-/* Títulos Principais */
+/* Títulos Principais no Conteúdo */
 .main-title {
     font-size: 2.2rem;
     font-weight: 800;
@@ -74,16 +146,31 @@ div[role="radiogroup"] label:hover {
     margin-bottom: 30px;
     letter-spacing: 2px;
 }
-.sidebar-footer {
-    position: absolute;
-    bottom: 20px;
+.sidebar-footer-container {
+    margin-top: 150px;
     font-size: 0.75rem;
     color: rgba(255,255,255,0.5);
-    padding: 0 20px;
+    padding: 0 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 15px;
 }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
+
+# Renderizar a Barra Superior (Topbar) SISTER
+st.markdown("""
+<div class="app-topbar">
+  <div class="brand-container">
+    <span class="brand-super">RESILIÊNCIA</span>
+    <span class="brand-main">Clima v2</span>
+  </div>
+  <div class="topbar-center">SISTER | Painel de Resiliência Climática</div>
+  <div class="topbar-right">
+    <a href="https://github.com/jpereiratrindade/Open-Meteo" target="_blank" class="topbar-btn">Repositório GitHub</a>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ---- Carregar Dados do IBGE via GitHub ----
 @st.cache_data(ttl=24*3600)
@@ -111,7 +198,7 @@ with st.sidebar:
         ["🌎 Explorador Nacional", "📊 Operação Consolidada"],
         label_visibility="collapsed"
     )
-    st.markdown('<div class="sidebar-footer">© 2026 Embrapa<br>Painel de Resiliência Climática v2.0</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-footer-container">© 2026 Embrapa<br>Painel de Resiliência Climática v2.0</div>', unsafe_allow_html=True)
 
 # ==========================================
 # CONTEÚDO PRINCIPAL
