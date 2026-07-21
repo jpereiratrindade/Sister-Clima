@@ -20,7 +20,9 @@
 
 ### 🌎 Explorador Nacional
 - Seleção dinâmica de **Estado → Município** (5.570 municípios via IBGE)
-- Consulta automática dos **últimos 30 dias** com opção de dual data source: **Open-Meteo NWP** ou **NASA POWER MERRA-2**
+- Consulta automática de qualquer período com opção de dual data source: **Open-Meteo NWP** ou **NASA POWER MERRA-2**
+- **Sensoriamento Espacial de Alta Resolução:** Mapa de superfície intra-municipal com "Grid Fetching" de ~5.5km
+- **Ray-Casting Algorítmico e Oversampling:** Recorte perfeito (Clipping) da grade de pixels pelo polígono oficial do município (GeoJSON do IBGE)
 - KPIs operacionais: volume acumulado, pico máximo, média diária, dias chuvosos
 - Gráfico de barras da distribuição diária
 - Curva de acúmulo mensal com área preenchida e marcadores

@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import os
+import io
 import requests
 from datetime import datetime, timedelta, date
+import numpy as np
+import plotly.figure_factory as ff
 
 st.set_page_config(page_title="SISTER-Clima | Resiliência Climática", layout="wide", page_icon="🌧️", initial_sidebar_state="expanded")
 
@@ -204,32 +207,173 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ---- Helper de Requisição Seguro ----
+def fetch_url(url, proxy_settings, **kwargs):
+    s = requests.Session()
+    if proxy_settings.get("mode") == "Direta (Ignorar proxy do sistema)":
+        s.trust_env = False  # Ignora totalmente variáveis de ambiente (SOCKS, HTTP_PROXY, etc)
+    elif proxy_settings.get("mode") == "Proxy Customizado" and proxy_settings.get("custom_url"):
+        s.proxies = {"http": proxy_settings["custom_url"], "https": proxy_settings["custom_url"]}
+    return s.get(url, **kwargs)
+
 # ---- Carregar Dados do IBGE via GitHub ----
 @st.cache_data(ttl=24*3600)
-def load_estados():
+def load_estados(proxy_settings):
     url = "https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/main/csv/estados.csv"
-    df = pd.read_csv(url)
+    res = fetch_url(url, proxy_settings, timeout=15)
+    res.raise_for_status()
+    df = pd.read_csv(io.StringIO(res.text))
     return df
 
 @st.cache_data(ttl=24*3600)
-def load_municipios():
+def load_municipios(proxy_settings):
     url = "https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/main/csv/municipios.csv"
-    df = pd.read_csv(url)
+    res = fetch_url(url, proxy_settings, timeout=15)
+    res.raise_for_status()
+    df = pd.read_csv(io.StringIO(res.text))
     return df
+    
+@st.cache_data(ttl=24*3600)
+def fetch_intra_municipal_surface(codigo_ibge, data_inicio, data_fim, proxy_settings):
+    # Fetch GeoJSON
+    url_geo = f"https://servicodados.ibge.gov.br/api/v3/malhas/municipios/{codigo_ibge}?formato=application/vnd.geo+json"
+    res_geo = fetch_url(url_geo, proxy_settings, timeout=15)
+    res_geo.raise_for_status()
+    geojson = res_geo.json()
+    
+    lats, lons = [], []
+    def extract_coords(coords):
+        for c in coords:
+            if isinstance(c[0], (list, tuple)):
+                extract_coords(c)
+            else:
+                lons.append(c[0])
+                lats.append(c[1])
+                
+    features = geojson.get("features", [])
+    if features:
+        extract_coords(features[0]["geometry"]["coordinates"])
+        
+    def point_in_polygon(x, y, poly):
+        n = len(poly)
+        inside = False
+        p1x, p1y = poly[0]
+        for i in range(n + 1):
+            p2x, p2y = poly[i % n]
+            if y > min(p1y, p2y):
+                if y <= max(p1y, p2y):
+                    if x <= max(p1x, p2x):
+                        if p1y != p2y:
+                            xints = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                        if p1x == p2x or x <= xints:
+                            inside = not inside
+            p1x, p1y = p2x, p2y
+        return inside
 
-df_estados = load_estados()
-df_municipios = load_municipios()
+    def point_in_multipolygon(x, y, geometry):
+        coords = geometry["coordinates"]
+        if geometry["type"] == "Polygon":
+            coords = [coords]
+        for polygon in coords:
+            exterior = polygon[0]
+            if point_in_polygon(x, y, exterior):
+                in_hole = False
+                for hole in polygon[1:]:
+                    if point_in_polygon(x, y, hole):
+                        in_hole = True
+                        break
+                if not in_hole:
+                    return True
+        return False
+        
+    min_lat, max_lat = min(lats), max(lats)
+    min_lon, max_lon = min(lons), max(lons)
+    
+    # Generate high-density grid (0.05 degree ~ 5.5km) to avoid gaps
+    step = 0.05
+    grid_lats = np.arange(min_lat, max_lat + step, step)
+    grid_lons = np.arange(min_lon, max_lon + step, step)
+    
+    geometry = features[0]["geometry"]
+    coords = []
+    for lat in grid_lats:
+        for lon in grid_lons:
+            if point_in_multipolygon(lon, lat, geometry):
+                coords.append((lat, lon))
+    
+    # Cap to avoid extreme API loads on giant regions (safety)
+    if len(coords) > 400:
+        step = 0.1
+        grid_lats = np.arange(min_lat, max_lat + step, step)
+        grid_lons = np.arange(min_lon, max_lon + step, step)
+        coords = []
+        for lat in grid_lats:
+            for lon in grid_lons:
+                if point_in_multipolygon(lon, lat, geometry):
+                    coords.append((lat, lon))
+
+    rows = []
+    chunk_size = 50
+    om_url = "https://archive-api.open-meteo.com/v1/archive"
+    
+    for i in range(0, len(coords), chunk_size):
+        chunk = coords[i:i+chunk_size]
+        lat_str = ",".join([str(round(c[0], 4)) for c in chunk])
+        lon_str = ",".join([str(round(c[1], 4)) for c in chunk])
+        params = {
+            "latitude": lat_str,
+            "longitude": lon_str,
+            "start_date": data_inicio.strftime("%Y-%m-%d"),
+            "end_date": data_fim.strftime("%Y-%m-%d"),
+            "daily": "precipitation_sum",
+            "timezone": "America/Sao_Paulo"
+        }
+        res = fetch_url(om_url, proxy_settings, params=params, timeout=25)
+        res.raise_for_status()
+        data_om = res.json()
+        if isinstance(data_om, dict): 
+            data_om = [data_om]
+        for j, site_data in enumerate(data_om):
+            if "daily" in site_data and "precipitation_sum" in site_data["daily"]:
+                vals = site_data["daily"]["precipitation_sum"]
+                total = sum([v for v in vals if v is not None])
+                rows.append({"latitude": chunk[j][0], "longitude": chunk[j][1], "Total (mm)": total})
+                
+    return pd.DataFrame(rows), geojson, min_lat, max_lat, min_lon, max_lon
 
 # ==========================================
-# SIDEBAR (Navegação)
+# SIDEBAR (Navegação & Configuração)
 # ==========================================
 with st.sidebar:
     st.markdown('<div class="sidebar-logo-text">Resiliência Climática</div>', unsafe_allow_html=True)
+    
+    with st.expander("🌐 Configuração de Rede (Proxy)", expanded=False):
+        proxy_mode = st.radio("Conexão:", ["Direta (Ignorar proxy do sistema)", "Usar Proxy do Sistema", "Proxy Customizado"])
+        custom_proxy = ""
+        if proxy_mode == "Proxy Customizado":
+            custom_proxy = st.text_input("URL do Proxy (ex: http://proxy:8080 ou socks5://...)")
+            if not custom_proxy.startswith("http") and not custom_proxy.startswith("socks") and custom_proxy:
+                custom_proxy = "http://" + custom_proxy
+        
+        proxy_settings = {
+            "mode": proxy_mode,
+            "custom_url": custom_proxy
+        }
+
     menu_selecionado = st.radio(
         "Navegação:",
         ["🌎 Explorador Nacional", "📊 Operação Consolidada", "📖 Sobre os Dados"],
         label_visibility="collapsed"
     )
+
+try:
+    df_estados = load_estados(proxy_settings)
+    df_municipios = load_municipios(proxy_settings)
+except Exception as e:
+    st.error(f"Erro ao carregar dados. Verifique a configuração de rede/proxy na barra lateral. Detalhe: {e}")
+    st.stop()
+
+with st.sidebar:
     # Timestamp = data da última coleta real (última entrada do CSV)
     ultima_coleta = "Sem dados ainda"
     CSV_PATH_CHECK = "data/chuva_diaria.csv"
@@ -344,7 +488,7 @@ if menu_selecionado == "🌎 Explorador Nacional":
                     "end": end_dt.strftime("%Y%m%d"),
                     "format": "JSON"
                 }
-                res = requests.get(nasa_url, params=nasa_params, timeout=20)
+                res = fetch_url(nasa_url, proxy_settings, params=nasa_params, timeout=20)
                 res.raise_for_status()
                 data = res.json()
                 raw = data["properties"]["parameter"]["PRECTOTCORR"]
@@ -363,7 +507,7 @@ if menu_selecionado == "🌎 Explorador Nacional":
                     "start_date": start_dt.strftime("%Y-%m-%d"),
                     "end_date": end_dt.strftime("%Y-%m-%d")
                 }
-                res = requests.get(url, params=params, timeout=15)
+                res = fetch_url(url, proxy_settings, params=params, timeout=15)
                 res.raise_for_status()
                 data = res.json()
                 df_live = pd.DataFrame({
@@ -426,8 +570,8 @@ if menu_selecionado == "🌎 Explorador Nacional":
                 fig2.update_layout(margin=dict(l=20, r=20, t=40, b=20), plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
                 st.plotly_chart(fig2, use_container_width=True)
 
-            # --- ROW 3: DONUT & TABLE ---
-            col_donut, col_table = st.columns([1, 1.5])
+            # --- ROW 3: DONUT E MAPA DE SUPERFÍCIE ---
+            col_donut, col_map_single = st.columns([1, 1.5])
             with col_donut:
                 contagem = df_live["Intensidade"].value_counts().reset_index()
                 contagem.columns = ["Intensidade", "Dias"]
@@ -441,12 +585,79 @@ if menu_selecionado == "🌎 Explorador Nacional":
                 fig3.update_layout(margin=dict(l=0, r=0, t=40, b=0), plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", showlegend=True, legend=dict(orientation="h", y=-0.1))
                 st.plotly_chart(fig3, use_container_width=True)
                 
-            with col_table:
-                st.markdown("**Registro Analítico Diário**")
-                st.dataframe(
-                    df_live.sort_values(by="Data", ascending=False).style.format({"Chuva (mm)": "{:.1f}", "Acumulado (mm)": "{:.1f}"}),
-                    use_container_width=True, height=300
-                )
+            with col_map_single:
+                try:
+                    cod_ibge = cidade_info["codigo_ibge"]
+                    with st.spinner(f"Mapeando variação intra-municipal em alta resolução para {municipio_sel_nome}..."):
+                        df_grid, geojson, min_lat, max_lat, min_lon, max_lon = fetch_intra_municipal_surface(
+                            cod_ibge, start_dt, end_dt, proxy_settings
+                        )
+                        
+                        # Densificação Espacial (Gap Filling):
+                        # Cria uma nuvem de pontos ao redor de cada coordenada real para forçar o Plotly
+                        # a preencher 100% da área de superfície sem deixar buracos entre os hexágonos.
+                        oversampled = []
+                        for _, row in df_grid.iterrows():
+                            lat = row['latitude']
+                            lon = row['longitude']
+                            val = row['Total (mm)']
+                            # 9 pontos preenchendo a área do pixel original
+                            for dlat in [-0.02, 0, 0.02]:
+                                for dlon in [-0.02, 0, 0.02]:
+                                    oversampled.append({'latitude': lat + dlat, 'longitude': lon + dlon, 'Total (mm)': val})
+                        df_grid_dense = pd.DataFrame(oversampled)
+                        
+                        if start_dt == end_dt:
+                            periodo_str = f"Data: {start_dt.strftime('%d/%m/%Y')}"
+                        else:
+                            periodo_str = f"Período: {start_dt.strftime('%d/%m/%Y')} a {end_dt.strftime('%d/%m/%Y')}"
+                        map_title = f"Superfície Intra-Municipal: {municipio_sel_nome}<br><sup>{periodo_str} (Acumulado)</sup>"
+                        
+                        try:
+                            fig_map_single = ff.create_hexbin_map(
+                                data_frame=df_grid_dense, lat="latitude", lon="longitude",
+                                nx_hexagon=25, opacity=0.85, labels={"color": "Precipitação (mm)"},
+                                color="Total (mm)", agg_func=np.mean,
+                                min_count=1, color_continuous_scale="Blues",
+                                title=map_title,
+                                zoom=9
+                            )
+                        except AttributeError:
+                            fig_map_single = ff.create_hexbin_mapbox(
+                                data_frame=df_grid_dense, lat="latitude", lon="longitude",
+                                nx_hexagon=25, opacity=0.85, labels={"color": "Precipitação (mm)"},
+                                color="Total (mm)", agg_func=np.mean,
+                                min_count=1, color_continuous_scale="Blues",
+                                title=map_title,
+                                zoom=9, mapbox_style="open-street-map"
+                            )
+                            
+                        # Overlay IBGE GeoJSON
+                        fig_map_single.update_layout(
+                            mapbox={
+                                "layers": [
+                                    {
+                                        "source": geojson,
+                                        "type": "line",
+                                        "color": "black",
+                                        "line": {"width": 2}
+                                    }
+                                ],
+                                "center": {"lat": (min_lat + max_lat) / 2, "lon": (min_lon + max_lon) / 2}
+                            },
+                            plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=20, r=20, t=40, b=20)
+                        )
+                        st.plotly_chart(fig_map_single, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Erro ao gerar mapa intra-municipal: {e}")
+
+            # --- ROW 4: TABELA ---
+            st.write("")
+            st.markdown("**Registro Analítico Diário**")
+            st.dataframe(
+                df_live.sort_values(by="Data", ascending=False).style.format({"Chuva (mm)": "{:.1f}", "Acumulado (mm)": "{:.1f}"}),
+                use_container_width=True, height=300
+            )
         except Exception as e:
             st.error(f"Erro na comunicação com a API: {e}")
 
@@ -539,7 +750,7 @@ elif menu_selecionado == "📊 Operação Consolidada":
                             "end_date": data_fim.strftime("%Y-%m-%d"),
                             "daily": "precipitation_sum", "timezone": "America/Sao_Paulo"
                         }
-                        res = requests.get(archive_url, params=params, timeout=12)
+                        res = fetch_url(archive_url, proxy_settings, params=params, timeout=12)
                         res.raise_for_status()
                         data_api = res.json()
                         df_extra = pd.DataFrame({
@@ -569,6 +780,7 @@ elif menu_selecionado == "📊 Operação Consolidada":
             kpi4.metric("Cidades Monitoradas", f"{df_filtrado['cidade'].nunique()}")
 
             st.write("")
+            st.write("")
             col_chart, col_map = st.columns(2)
             with col_chart:
                 fig_linha = px.line(
@@ -580,17 +792,18 @@ elif menu_selecionado == "📊 Operação Consolidada":
                 st.plotly_chart(fig_linha, use_container_width=True)
 
             with col_map:
+                df_mapa = df_filtrado.groupby(["cidade", "latitude", "longitude"]).agg({"precipitacao_mm": "sum"}).reset_index()
                 try:
                     fig_mapa = px.scatter_map(
-                        df_filtrado, lat="latitude", lon="longitude", size="precipitacao_mm", color="precipitacao_mm",
-                        hover_name="cidade", hover_data=["data", "precipitacao_mm"], color_continuous_scale="Blues",
-                        size_max=35, zoom=5.5, title="Mapa de Volume Espacial"
+                        df_mapa, lat="latitude", lon="longitude", size="precipitacao_mm", color="precipitacao_mm",
+                        hover_name="cidade", color_continuous_scale="Blues",
+                        size_max=35, zoom=5.5, title="Acumulado por Ponto (Bolhas)"
                     )
                 except AttributeError:
                     fig_mapa = px.scatter_mapbox(
-                        df_filtrado, lat="latitude", lon="longitude", size="precipitacao_mm", color="precipitacao_mm",
-                        hover_name="cidade", hover_data=["data", "precipitacao_mm"], color_continuous_scale="Blues",
-                        size_max=35, zoom=5.5, title="Mapa de Volume Espacial", mapbox_style="open-street-map"
+                        df_mapa, lat="latitude", lon="longitude", size="precipitacao_mm", color="precipitacao_mm",
+                        hover_name="cidade", color_continuous_scale="Blues",
+                        size_max=35, zoom=5.5, title="Acumulado por Ponto (Bolhas)", mapbox_style="open-street-map"
                     )
                 fig_mapa.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=20, r=20, t=40, b=20))
                 st.plotly_chart(fig_mapa, use_container_width=True)
